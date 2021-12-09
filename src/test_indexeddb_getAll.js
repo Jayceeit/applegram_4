@@ -18,6 +18,7 @@ for(var i = 0; i < 10000; ++i) {
 
 appUsersManager.storage.set(users);
 appStorage.storage.set('users', users);
+console.log(users)
 
 var types = {}; 
 appStateManager.neededPeers.forEach((value, key) => {

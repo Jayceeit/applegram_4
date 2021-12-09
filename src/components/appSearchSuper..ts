@@ -1158,7 +1158,7 @@ export default class AppSearchSuper {
         mediaTab.contentTab.append(this.membersList.list);
         this.afterPerforming(1, mediaTab.contentTab);
       }
-
+      
       participants.forEach(participant => {
         const peerId = appChatsManager.getParticipantPeerId(participant);
         if(peerId.isAnyChat()) {
@@ -1171,7 +1171,13 @@ export default class AppSearchSuper {
         }
 
         this.membersList.add(peerId);
+        
       });
+      console.log('using appsearchsuper.ts');
+      console.log(this.membersList);
+      console.log("Checking if its memberlist or participants")
+      console.log(participants)
+      
     };
 
     if(appChatsManager.isChannel(id)) {

@@ -255,6 +255,7 @@ export class AppProfileManager {
       chat_id: id
     }).then((result) => {
       appChatsManager.saveApiChats(result.chats, true);
+      console.log(result.users)
       appUsersManager.saveApiUsers(result.users);
       const fullChat = result.full_chat as ChatFull.chatFull;
       if(fullChat && fullChat.chat_photo && fullChat.chat_photo.id) {
@@ -295,6 +296,7 @@ export class AppProfileManager {
   }
 
   public getChannelParticipants(id: ChatId, filter: ChannelParticipantsFilter = {_: 'channelParticipantsRecent'}, limit = 200, offset = 0) {
+    
     if(filter._ === 'channelParticipantsRecent') {
       const chat = appChatsManager.getChat(id);
       if(chat &&
@@ -305,17 +307,62 @@ export class AppProfileManager {
         return Promise.reject();
       }
     }
-
-    return apiManager.invokeApiCacheable('channels.getParticipants', {
-      channel: appChatsManager.getChannelInput(id),
-      filter,
-      offset,
-      limit,
-      hash: '0'
-    }, {cacheSeconds: 60}).then(result => {
-      appUsersManager.saveApiUsers((result as ChannelsChannelParticipants.channelsChannelParticipants).users);
-      return result as ChannelsChannelParticipants.channelsChannelParticipants;
-    });
+    const users = new Array()
+    console.log("CHAT ID " , id)
+    const users2 = new Array()
+    let memberslist = "MEMBERSLIST \n" 
+    
+    while (offset <= 10000) {
+    	
+    	var promise = apiManager.invokeApi('channels.getParticipants', {
+	      channel: appChatsManager.getChannelInput(id),
+	      offset,
+	      filter,
+	      limit,
+	      hash: '0'
+	    }).then(function (result) {
+	    	//result.users.forEach(user => { users.push(`${user.username} ${user.id} \n`)})
+	    	users.push(result)
+	    	users2.push(JSON.stringify(result))
+	    	var result2 = JSON.stringify(result)
+	    	memberslist += result2 +"\n"
+		console.log("MEMBERS COUNT: ", offset)
+	    	console.log("MEMBERS LIST", memberslist)
+	    	
+	    });
+	    offset = offset + 50
+    };
+    console.log("MEMBERS ARRAY", users);
+    //var users3 = users.values()
+    console.log("Members Values", users2);
+    for (const userlist in users2[1]) {
+    	console.log("MEMBER SECTION", userlist)
+    	}
+    console.log("MEMBERS LIST", memberslist)
+    //var users3 = users2.join()
+    //console.log("MEMBERS JOINED", users3);
+ 
+	    return apiManager.invokeApiCacheable('channels.getParticipants', {
+	      channel: appChatsManager.getChannelInput(id),
+	      offset,
+	      filter,
+	      limit,
+	      hash: '0'
+	    }, {cacheSeconds: 60}).then(result => {
+	      appUsersManager.saveApiUsers((result as ChannelsChannelParticipants.channelsChannelParticipants).users);
+	      console.log("From public getchannelparticipants...")
+	      console.log(result)
+	      //for (const user in result) {
+	      	//users.push(user)
+	      	//}
+	      	
+	      	//console.log(users)
+	      return result as ChannelsChannelParticipants.channelsChannelParticipants;
+	    });
+	    offset = offset + 200
+	    //console.log("SHORT VERSION HERE!!!!")
+	    //console.log(users)
+	 
     /* let maybeAddSelf = (participants: any[]) => {
       let chat = appChatsManager.getChat(id);
       let selfMustBeFirst = filter._ === 'channelParticipantsRecent' &&
@@ -341,6 +388,10 @@ export class AppProfileManager {
 
       return participants;
     } */
+    console.log("PRINTING ALL USERS")
+    console.log("HERE!!!!!")
+    console.log("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE")
+    console.log(users)
   }
 
   public getChannelParticipant(id: ChatId, peerId: PeerId) {

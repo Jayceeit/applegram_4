@@ -519,7 +519,8 @@ export class ApiManagerProxy extends CryptoWorkerMethods {
       promise,
       params
     };
-
+    console.log("From the API cacheable call....")
+    console.log(promise)
     return promise;
   }
 

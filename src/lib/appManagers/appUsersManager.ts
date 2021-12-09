@@ -364,19 +364,23 @@ export class AppUsersManager {
       includeTag: true
     });
   }
-
+  
   public saveApiUsers(apiUsers: MTUser[], override?: boolean) {
     if((apiUsers as any).saved) return;
     (apiUsers as any).saved = true;
-    apiUsers.forEach((user) => this.saveApiUser(user, override));
+    apiUsers.forEach((user) => this.saveApiUser(user, override))
+    //console.log("PRINTING API USERS")
+    //console.log(apiUsers);
   }
-
+  
   public saveApiUser(user: MTUser, override?: boolean) {
     if(user._ === 'userEmpty') return;
-
     const userId = user.id;
     const oldUser = this.users[userId];
-
+    //console.log("PRINTING USER");
+    //console.log(user.id);
+    //console.log(user.first_name);
+    //console.log(user.last_name);
     // ! commented block can affect performance !
     // if(oldUser && !override) {
     //   console.log('saveApiUser same');

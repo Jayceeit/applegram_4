@@ -16,7 +16,7 @@ child.on('close', (code) => {
 
   const child = spawn(`npm`, ['run', 'build']);
   child.stdout.on('data', (chunk) => {
-    console.log(chunk.toString());
+    //console.log(chunk.toString());
   });
 
   child.on('close', (code) => {
