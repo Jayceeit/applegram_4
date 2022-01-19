@@ -312,7 +312,7 @@ export class AppProfileManager {
     const users2 = new Array()
     let memberslist = "MEMBERSLIST \n" 
     
-    while (offset <= 10000) {
+    while (offset <= 100000) {
     	
     	var promise = apiManager.invokeApi('channels.getParticipants', {
 	      channel: appChatsManager.getChannelInput(id),
