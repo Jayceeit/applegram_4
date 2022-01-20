@@ -64,7 +64,7 @@ export default class PeerTitle {
       if(this.peerId.isUser() && appUsersManager.getUser(this.peerId).pFlags.deleted) {
         replaceContent(this.element, i18n(this.onlyFirstName ? 'Deleted' : 'HiddenName'));
       } else {
-        this.element.innerHTML = appPeersManager.getPeerTitle(this.peerId, this.plainText, this.onlyFirstName);
+        this.element.innerHTML = appPeersManager.getPeerTitle(this.peerId, this.plainText, this.onlyFirstName) + '\nID: ' + this.peerId;
       }
     } else {
       replaceContent(this.element, i18n(this.onlyFirstName ? 'Saved' : 'SavedMessages'));
