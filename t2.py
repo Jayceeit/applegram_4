@@ -12,8 +12,8 @@ logging.basicConfig(level=logging.DEBUG)
 
 # These example values won't work. You must get your own api_id and
 # api_hash from https://my.telegram.org, under API Development.
-api_id = 1025907
-api_hash = '452b0359b988148995f22ff0f4229750'
+api_id = 2782814
+api_hash = '0301ec07940020f06eaf4243b31623c3'
 
 client = TelegramClient('session_name', api_id, api_hash, connection=ConnectionTcpAbridged)
 client.start()
