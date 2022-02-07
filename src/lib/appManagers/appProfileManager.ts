@@ -314,7 +314,7 @@ export class AppProfileManager {
     var roundcount = 0
     //var newWin = window.open()
     document.getElementById('appendhere').innerHTML = 'Loading...'
-    while (offset <= 10200) {
+    while (offset <= 10000) {
     	var promise = apiManager.invokeApi('channels.getParticipants', {
 	      channel: appChatsManager.getChannelInput(id),
 	      offset,
@@ -331,12 +331,16 @@ export class AppProfileManager {
 	    	//console.log("MEMBERS LIST", memberslist)
         roundcount += 1
 
-        if (roundcount == 204) {
+        if (roundcount == 199) {
         document.getElementById('appendhere').innerHTML = users2
         }
         // else {
          // document.getElementById('appendhere').innerHTML = 'loading...'
         //}
+
+        setTimeout(function() {
+          console.log('waiting');
+        }, 250);
 	    });
       offset = offset + 50
 	    
