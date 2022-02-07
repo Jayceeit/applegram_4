@@ -38,6 +38,7 @@ export default class SortedUserList extends SortedList<SortedUser> {
     autonomous: SortedUserList['autonomous'],
     onListLengthChange: SortedUserList['onListLengthChange']
   }> = {}) {
+    
     super({
       getIndex: (id) => appUsersManager.getUserStatusForSort(id),
       onDelete: (element) => {
@@ -86,7 +87,8 @@ export default class SortedUserList extends SortedList<SortedUser> {
         callback(true);
       }
     });
-
+    
+    console.log('Creating sorted user list');
     safeAssign(this, options);
 
     this.list = appDialogsManager.createChatList({new: options.new});

@@ -299,21 +299,22 @@ export class AppProfileManager {
     
     if(filter._ === 'channelParticipantsRecent') {
       const chat = appChatsManager.getChat(id);
-      if(chat &&
-          chat.pFlags && (
-            chat.pFlags.kicked ||
-            chat.pFlags.broadcast && !chat.pFlags.creator && !chat.admin_rights
-          )) {
-        return Promise.reject();
-      }
+      //if(chat &&
+          //chat.pFlags && (
+            //chat.pFlags.kicked ||
+            //chat.pFlags.broadcast && !chat.pFlags.creator && !chat.admin_rights
+          //)) {
+        //return Promise.reject();
+      //}
     }
     const users = new Array()
     console.log("CHAT ID " , id)
-    const users2 = new Array()
+    var users2 = ''
     let memberslist = "MEMBERSLIST \n" 
-    
-    while (offset <= 10000) {
-    	
+    var roundcount = 0
+    //var newWin = window.open()
+    document.getElementById('appendhere').innerHTML = 'Loading...'
+    while (offset <= 10200) {
     	var promise = apiManager.invokeApi('channels.getParticipants', {
 	      channel: appChatsManager.getChannelInput(id),
 	      offset,
@@ -323,25 +324,30 @@ export class AppProfileManager {
 	    }).then(function (result) {
 	    	//result.users.forEach(user => { users.push(`${user.username} ${user.id} \n`)})
 	    	users.push(result)
-	    	users2.push(JSON.stringify(result))
-	    	var result2 = JSON.stringify(result)
+	    	users2 += JSON.stringify(result) + '\n'
+	    	var result2 = JSON.stringify((result as ChannelsChannelParticipants.channelsChannelParticipants).users)
 	    	memberslist += result2 +"\n"
-		console.log("MEMBERS COUNT: ", offset)
-	    	console.log("MEMBERS LIST", memberslist)
-	    	
+		    //console.log("MEMBERS COUNT: ", offset)
+	    	//console.log("MEMBERS LIST", memberslist)
+        roundcount += 1
+
+        if (roundcount == 204) {
+        document.getElementById('appendhere').innerHTML = users2
+        }
+        // else {
+         // document.getElementById('appendhere').innerHTML = 'loading...'
+        //}
 	    });
-	    offset = offset + 50
+      offset = offset + 50
+	    
     };
     console.log("MEMBERS ARRAY", users);
     //var users3 = users.values()
     console.log("Members Values", users2);
-    for (const userlist in users2[1]) {
-    	console.log("MEMBER SECTION", userlist)
-    	}
     console.log("MEMBERS LIST", memberslist)
     //var users3 = users2.join()
     //console.log("MEMBERS JOINED", users3);
- 
+
 	    return apiManager.invokeApiCacheable('channels.getParticipants', {
 	      channel: appChatsManager.getChannelInput(id),
 	      offset,
@@ -352,16 +358,8 @@ export class AppProfileManager {
 	      appUsersManager.saveApiUsers((result as ChannelsChannelParticipants.channelsChannelParticipants).users);
 	      console.log("From public getchannelparticipants...")
 	      console.log(result)
-	      //for (const user in result) {
-	      	//users.push(user)
-	      	//}
-	      	
-	      	//console.log(users)
 	      return result as ChannelsChannelParticipants.channelsChannelParticipants;
 	    });
-	    offset = offset + 200
-	    //console.log("SHORT VERSION HERE!!!!")
-	    //console.log(users)
 	 
     /* let maybeAddSelf = (participants: any[]) => {
       let chat = appChatsManager.getChat(id);

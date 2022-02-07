@@ -18,8 +18,8 @@ api_id = 1025907
 api_hash = '452b0359b988148995f22ff0f4229750'
 
 client = TelegramClient('session_name', api_id, api_hash, connection=ConnectionTcpAbridged)
-#client.start()
-#client.connect()
+client.start()
+client.connect()
 
 authKey = AuthKey(bytes.fromhex("2c45ed62da34d41bc82b6ef660760d3b01cb80028b0c363633f1c40ec80d5f4ad9d4ddee646736b6a9465fd7258b8936dedde6a86c69b4a03277ed6c543ccfd31fa8fa9f9449d686b4822b54542c91255231ecfa6aed4a9896cdcc3d5491e7f1b7529cbff75597f262813ced7eb3b5ac1e7e6794ca7aa00c5ea4d1d714e7c276fb63e5f8a1742cf4707eace8a6ec2ed4dcceceabdc7fc92bd099c811931e0da337f1b0271d8ba33e7a4a22fa1e4a913d8220edb0dd3a810ed408f03fe5d7f2d5dd43db4272d314b20a22376c03b0a05423600f4d012e7196ce9b3c45b28a75dbfa053222f5c86d1c6a706a2fd68ca270fd9a6449df1fa15a21837d34f4cf4e95"))
 state = MTProtoState(authKey, loggers=client._log)

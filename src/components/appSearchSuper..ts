@@ -1144,7 +1144,9 @@ export default class AppSearchSuper {
           if(!li) {
             return;
           }
-
+          console.log('Memberslist from supersearch ' + this.membersList)
+          //GO BACK HERE
+          document.getElementById('column-center').append('MEMBERSLIST CODE TIME~~~~')
           const peerId = li.dataset.peerId.toPeerId();
           let promise: Promise<any> = Promise.resolve();
           if(mediaSizes.isMobile) {
@@ -1158,9 +1160,15 @@ export default class AppSearchSuper {
         mediaTab.contentTab.append(this.membersList.list);
         this.afterPerforming(1, mediaTab.contentTab);
       }
-      
+      console.log('Memberslist from supersearch ' + this.membersList)
+      var count = 0
       participants.forEach(participant => {
         const peerId = appChatsManager.getParticipantPeerId(participant);
+        //Notes Here
+        //This was not printed by clicking on channels or chats
+        //This must be why members are not appearing. Was this maybe updated?
+
+        console.log('Printing participant' + participant)
         if(peerId.isAnyChat()) {
           return;
         }
@@ -1169,31 +1177,33 @@ export default class AppSearchSuper {
         if(user.pFlags.deleted) {
           return;
         }
-
+        count = count + 1
         this.membersList.add(peerId);
         
       });
-      console.log('using appsearchsuper.ts');
-      console.log(this.membersList);
-      console.log("Checking if its memberlist or participants")
-      console.log(participants)
+      //NOTES HERE
+      //Membercount consistantly returns 0. This could possibly be an api error? We can look into updating telethon.
+      console.log('MEMBERCOUNT ' + count)
       
     };
 
     if(appChatsManager.isChannel(id)) {
       const LOAD_COUNT = !this.membersList ? 50 : 200;
+      //NOTES HERE
+      //This runs any time a channel is opened
       promise = appProfileManager.getChannelParticipants(id, undefined, LOAD_COUNT, this.nextRates[mediaTab.inputFilter]).then(participants => {
         if(!middleware()) {
           return;
+          
         }
-
+        
         let list = mediaTab.contentTab.firstElementChild as HTMLUListElement;
         this.nextRates[mediaTab.inputFilter] = (list ? list.childElementCount : 0) + participants.participants.length;
-
+        console.log('particpants are ' + participants.participants)
         if(participants.participants.length < LOAD_COUNT) {
           this.loaded[mediaTab.inputFilter] = true;
         }
-
+        console.log('Runningchannelparticipants')
         return renderParticipants(participants.participants);
       });
     } else {
@@ -1206,9 +1216,10 @@ export default class AppSearchSuper {
         this.loaded[mediaTab.inputFilter] = true;
         const participants = chatFull.participants;
         if(participants._ === 'chatParticipantsForbidden') {
+          console.log('CHATFORBIDDEN' + participants._)
           return;
         }
-        
+        console.log('Participants are ' + participants.participants)
         return renderParticipants(participants.participants);
       });
     }

@@ -128,6 +128,8 @@ export class AppUsersManager {
             this.users[user.id] = user;
           }
         }
+        //NOTES HERE: CAN HAVE IT IMMEDIATELY SHOW CONTACTS
+        //alert(JSON.stringify(users))
       }
 
       const contactsList = state.contactsList;

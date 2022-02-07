@@ -97,7 +97,7 @@ export default class AppContactsTab extends SliderSuperTab {
       }
 
       const sortedUserList = this.sortedUserList = this.createList();
-
+      console.log('SortedUserList' + sortedUserList)
       let renderPage = () => {
         const pageCount = windowSize.windowH / 72 * 1.25 | 0;
         const arr = contacts.splice(0, pageCount); // надо splice!
@@ -105,7 +105,7 @@ export default class AppContactsTab extends SliderSuperTab {
         arr.forEach((peerId) => {
           sortedUserList.add(peerId);
         });
-
+        
         if(!contacts.length) {
           renderPage = undefined;
           this.scrollable.onScrolledBottom = null;
