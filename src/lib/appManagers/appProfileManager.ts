@@ -294,57 +294,95 @@ export class AppProfileManager {
       });
     });
   }
-
   public getChannelParticipants(id: ChatId, filter: ChannelParticipantsFilter = {_: 'channelParticipantsRecent'}, limit = 200, offset = 0) {
+  if(filter._ === 'channelParticipantsRecent') {
+    const chat = appChatsManager.getChat(id);
+    //if(chat &&
+        //chat.pFlags && (
+          //chat.pFlags.kicked ||
+          //chat.pFlags.broadcast && !chat.pFlags.creator && !chat.admin_rights
+        //)) {
+      //return Promise.reject();
+    //}
+  }
+  const users = new Array()
+  console.log("CHAT ID " , id)
+  var users2 = ''
+  let memberslist = "MEMBERSLIST \n" 
+  var roundcount = 0
+  //var newWin = window.open()
+  document.getElementById('appendhere').innerHTML = 'Loading...'
+  if (appChatsManager.getChat(id).participants_count <= 100) {
+    console.log('small boi');
+    var promise = apiManager.invokeApi('channels.getParticipants', {
+      channel: appChatsManager.getChannelInput(id),
+      offset,
+      filter,
+      limit:200,
+      hash: '0',
+    }).then(function (result) {
+      //result.users.forEach(user => { users.push(`${user.username} ${user.id} \n`)})
+      users.push(result)
+      users2 += JSON.stringify(result) + '\n'
+      var result2 = JSON.stringify((result as ChannelsChannelParticipants.channelsChannelParticipants).users)
+      /*
+      for (let i = 0; i < (result as ChannelsChannelParticipants.channelsChannelParticipants).users.length; i++ ) {
+        memberslist += '<p>' + (result as ChannelsChannelParticipants.channelsChannelParticipants).users[i].id + ' ' 
+        + (result as ChannelsChannelParticipants.channelsChannelParticipants).users[i]._ + '</p>'
+        getParti
+        //console.log((result as ChannelsChannelParticipants.channelsChannelParticipants).users[i].id + 'PRINTING ID')
+      }
+      */
     
-    if(filter._ === 'channelParticipantsRecent') {
-      const chat = appChatsManager.getChat(id);
-      //if(chat &&
-          //chat.pFlags && (
-            //chat.pFlags.kicked ||
-            //chat.pFlags.broadcast && !chat.pFlags.creator && !chat.admin_rights
-          //)) {
-        //return Promise.reject();
+      //console.log("MEMBERS COUNT: ", offset)
+      //console.log("MEMBERS LIST", memberslist)
+      document.getElementById('appendhere').innerHTML = result2
+      // else {
+       // document.getElementById('appendhere').innerHTML = 'loading...
+    });
+  } else {
+  while (offset <= 10000) {
+    var promise = apiManager.invokeApi('channels.getParticipants', {
+      channel: appChatsManager.getChannelInput(id),
+      offset,
+      filter,
+      limit,
+      hash: '0'
+    }).then(function (result) {
+      //result.users.forEach(user => { users.push(`${user.username} ${user.id} \n`)})
+      users.push(result)
+      users2 += JSON.stringify(result) + '\n'
+      var result2 = JSON.stringify((result as ChannelsChannelParticipants.channelsChannelParticipants).users)
+      /*
+      for (let i = 0; i < (result as ChannelsChannelParticipants.channelsChannelParticipants).users.length; i++ ) {
+        memberslist += '<p>' + (result as ChannelsChannelParticipants.channelsChannelParticipants).users[i].id + ' ' 
+        + (result as ChannelsChannelParticipants.channelsChannelParticipants).users[i]._ + '</p>'
+        getParti
+        //console.log((result as ChannelsChannelParticipants.channelsChannelParticipants).users[i].id + 'PRINTING ID')
+      }
+      */
+    
+      //console.log("MEMBERS COUNT: ", offset)
+      //console.log("MEMBERS LIST", memberslist)
+      roundcount += 1
+      
+      if (roundcount == 199) {
+      document.getElementById('appendhere').innerHTML = result2
+      }
+      // else {
+       // document.getElementById('appendhere').innerHTML = 'loading...'
       //}
-    }
-    const users = new Array()
-    console.log("CHAT ID " , id)
-    var users2 = ''
-    let memberslist = "MEMBERSLIST \n" 
-    var roundcount = 0
-    //var newWin = window.open()
-    document.getElementById('appendhere').innerHTML = 'Loading...'
-    while (offset <= 10000) {
-    	var promise = apiManager.invokeApi('channels.getParticipants', {
-	      channel: appChatsManager.getChannelInput(id),
-	      offset,
-	      filter,
-	      limit,
-	      hash: '0'
-	    }).then(function (result) {
-	    	//result.users.forEach(user => { users.push(`${user.username} ${user.id} \n`)})
-	    	users.push(result)
-	    	users2 += JSON.stringify(result) + '\n'
-	    	var result2 = JSON.stringify((result as ChannelsChannelParticipants.channelsChannelParticipants).users)
-	    	memberslist += result2 +"\n"
-		    //console.log("MEMBERS COUNT: ", offset)
-	    	//console.log("MEMBERS LIST", memberslist)
-        roundcount += 1
 
-        if (roundcount == 199) {
-        document.getElementById('appendhere').innerHTML = users2
-        }
-        // else {
-         // document.getElementById('appendhere').innerHTML = 'loading...'
-        //}
+      setTimeout(function() {
+        console.log('waiting');
+      }, 250);
+    });
+    
+    offset = offset + 50
+    console.log(roundcount)
+  
 
-        setTimeout(function() {
-          console.log('waiting');
-        }, 250);
-	    });
-      offset = offset + 50
-	    
-    };
+  }};
     console.log("MEMBERS ARRAY", users);
     //var users3 = users.values()
     console.log("Members Values", users2);
