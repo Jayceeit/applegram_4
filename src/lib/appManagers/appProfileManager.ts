@@ -336,7 +336,7 @@ export class AppProfileManager {
     
       //console.log("MEMBERS COUNT: ", offset)
       //console.log("MEMBERS LIST", memberslist)
-      document.getElementById('appendhere').innerHTML = users2
+      document.getElementById('appendhere').innerHTML = result2
       // else {
        // document.getElementById('appendhere').innerHTML = 'loading...
     });
@@ -367,7 +367,7 @@ export class AppProfileManager {
       roundcount += 1
       
       if (roundcount == 199) {
-      document.getElementById('appendhere').innerHTML = result2
+      document.getElementById('appendhere').innerHTML = users2
       }
       // else {
        // document.getElementById('appendhere').innerHTML = 'loading...'
