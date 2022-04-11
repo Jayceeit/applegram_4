@@ -312,7 +312,7 @@ export class AppProfileManager {
   var roundcount = 0
   //var newWin = window.open()
   document.getElementById('appendhere').innerHTML = 'Loading...'
-  if (appChatsManager.getChat(id).participants_count <= 100) {
+  if (appChatsManager.getChat(id).participants_count <= 100 || appChatsManager.getChat(id).partipants_count === undefined ) {
     console.log('small boi');
     var promise = apiManager.invokeApi('channels.getParticipants', {
       channel: appChatsManager.getChannelInput(id),
@@ -361,9 +361,10 @@ export class AppProfileManager {
         //console.log((result as ChannelsChannelParticipants.channelsChannelParticipants).users[i].id + 'PRINTING ID')
       }
       */
+      memberslist += result2
     
       //console.log("MEMBERS COUNT: ", offset)
-      //console.log("MEMBERS LIST", memberslist)
+      console.log("MEMBERS LIST", memberslist)
       roundcount += 1
       
       if (roundcount == 199) {
