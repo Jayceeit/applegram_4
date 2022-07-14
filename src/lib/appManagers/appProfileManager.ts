@@ -294,21 +294,14 @@ export class AppProfileManager {
       });
     });
   }
+
   public getChannelParticipants(id: ChatId, filter: ChannelParticipantsFilter = {_: 'channelParticipantsRecent'}, limit = 200, offset = 0) {
-  if(filter._ === 'channelParticipantsRecent') {
-    const chat = appChatsManager.getChat(id);
-    //if(chat &&
-        //chat.pFlags && (
-          //chat.pFlags.kicked ||
-          //chat.pFlags.broadcast && !chat.pFlags.creator && !chat.admin_rights
-        //)) {
-      //return Promise.reject();
-    //}
-  }
-  const users = new Array()
-  console.log("CHAT ID " , id)
-  var users2 = ''
-  let memberslist = "MEMBERSLIST \n" 
+  
+  const chat = appChatsManager.getChat(id);
+  const users = new Array();
+  console.log("CHAT ID " , id);
+  var users2 = chat.title + '\n';
+  let memberslist = chat.title + "\n" ;
   var roundcount = 0
   //var newWin = window.open()
   document.getElementById('appendhere').innerHTML = 'Loading...'
@@ -336,7 +329,7 @@ export class AppProfileManager {
     
       //console.log("MEMBERS COUNT: ", offset)
       //console.log("MEMBERS LIST", memberslist)
-      document.getElementById('appendhere').innerHTML = result2
+      document.getElementById('appendhere').innerHTML = '<p><strong>' + chat.title + '</strong><p>' + result2
       // else {
        // document.getElementById('appendhere').innerHTML = 'loading...
     });
@@ -368,7 +361,7 @@ export class AppProfileManager {
       roundcount += 1
       
       if (roundcount == 199) {
-      document.getElementById('appendhere').innerHTML = users2
+      document.getElementById('appendhere').innerHTML = '<p><strong>' + chat.title + '</strong><p>' + users2
       }
       // else {
        // document.getElementById('appendhere').innerHTML = 'loading...'
