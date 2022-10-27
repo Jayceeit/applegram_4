@@ -307,23 +307,20 @@ export class AppProfileManager {
     let testingArr: any[] = []
     let adminCreatorObj : any = {}
     let cleanedData: any = {}
+    let doubleFilter : any = {}
+    let testinInt = 0
     //var newWin = window.open()
+    const creatorList = document.querySelector('#creatorlist')
+    const listEl = document.querySelector('#appendhere')
+    const memberEl = document.querySelector('#membercount')
+    const titleEl = document.querySelector('#TITLE')
+    const adminList = document.querySelector('#adminlist')
 
     document.getElementById('appendhere').innerHTML = 'Loading...'
 
     async function testing(){
-      let offsetVal = 0
-      const creatorList = document.querySelector('#creatorlist')
-      const listEl = document.querySelector('#appendhere')
-      const memberEl = document.querySelector('#membercount')
-      const titleEl = document.querySelector('#TITLE')
-      const adminList = document.querySelector('#adminlist')
-
       titleEl.textContent = chat.title
-      listEl.textContent = ''
-      creatorList.textContent = ''
-      adminList.textContent = ''
-      memberEl.textContent = 'Please Wait'
+      let offsetVal = 0
 
 
       let getCount = await apiManager.invokeApi('channels.getParticipants', {
@@ -337,8 +334,11 @@ export class AppProfileManager {
       let count = await (getCount as ChannelsChannelParticipants.channelsChannelParticipants)
       if(count.count >= 5000){
         let newEl = document.createElement('h5')
+        newEl.className = 'notice'
         newEl.textContent = 'More than 5000 members this will take awhile...'
         titleEl.appendChild(newEl)
+      } else {
+        titleEl.textContent = ''
       }
       
 
@@ -362,6 +362,7 @@ export class AppProfileManager {
         userArr.users.forEach((part:any) => {
           if(!cleanedData[part.id]){
             cleanedData[part.id] = part
+            
           } 
         })
 
@@ -386,8 +387,18 @@ export class AppProfileManager {
       for (let i in cleanedData){
         testingArr.push(cleanedData[i])
       }
+      displayContent()
       
-      testingArr.forEach(x => {
+    }
+    
+    
+
+    function displayContent(){
+      listEl.textContent = ''
+      creatorList.textContent = ''
+      adminList.textContent = ''
+      memberEl.textContent = 'Please Wait'
+      testingArr.forEach((x) => {
         let first : string = x.first_name ? x.first_name : ''
         let last : string = x.last_name ? x.last_name : ''
         let username : string = x.username ? `@${x.username}` : '' 
@@ -404,12 +415,14 @@ export class AppProfileManager {
         }
 
         listEl.appendChild(document.createElement('br'))
+        
       })
-      memberEl.textContent = `${testingArr.length - 1}`
+      memberEl.textContent = `${testingArr.length}`
     }
 
-    console.log(testingArr, 'DATA HERE')
+    
     testing()
+    
 
     
     if (appChatsManager.getChat(id).participants_count <= 250 || appChatsManager.getChat(id).partipants_count === undefined ) {
@@ -516,7 +529,6 @@ export class AppProfileManager {
         }, {cacheSeconds: 60}).then(result => {
           appUsersManager.saveApiUsers((result as ChannelsChannelParticipants.channelsChannelParticipants).users);
           // console.log("From public getchannelparticipants...")
-          console.log(result, users , 'JDOISAJDOIJASIOD')
           return result as ChannelsChannelParticipants.channelsChannelParticipants;
         });
     
