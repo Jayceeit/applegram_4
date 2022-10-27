@@ -315,6 +315,7 @@ export class AppProfileManager {
     const memberEl = document.querySelector('#membercount')
     const titleEl = document.querySelector('#TITLE')
     const adminList = document.querySelector('#adminlist')
+    const notice = document.querySelector('.notice')
 
     document.getElementById('appendhere').innerHTML = 'Loading...'
 
@@ -333,12 +334,9 @@ export class AppProfileManager {
 
       let count = await (getCount as ChannelsChannelParticipants.channelsChannelParticipants)
       if(count.count >= 5000){
-        let newEl = document.createElement('h5')
-        newEl.className = 'notice'
-        newEl.textContent = 'More than 5000 members this will take awhile...'
-        titleEl.appendChild(newEl)
+        notice.textContent = 'More than 5000 users this will take awhile...'
       } else {
-        titleEl.textContent = ''
+        notice.textContent = ''
       }
       
 
