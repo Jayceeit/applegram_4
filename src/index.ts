@@ -57,6 +57,39 @@ console.timeEnd('get storage1'); */
       };
     }
 
+    const buttonEl = document.querySelector('#press')
+    const buttonElTwo = document.querySelector('#press2')
+
+    buttonElTwo.addEventListener('click', async (evt)=>{
+      let memberEl = document.querySelectorAll('.member')
+      let listCopy: string[] = []
+      memberEl.forEach(x => {
+        listCopy.push(x.textContent)
+      })
+
+      console.log(listCopy)
+      
+      let data = await navigator.clipboard.writeText(listCopy.join('\n')).then(() => {
+        alert('copied')
+      })
+    
+    })
+
+    buttonEl.addEventListener('click', async (evt)=>{
+      let memberEl = document.querySelectorAll('#appendhere > li')
+      let listCopy: string[] = []
+      memberEl.forEach(x => {
+        listCopy.push(x.textContent)
+      })
+
+      console.log(listCopy)
+      
+      let data = await navigator.clipboard.writeText(listCopy.join('\n')).then(() => {
+        alert('copied')
+      })
+    
+    })
+
     // We listen to the resize event (https://css-tricks.com/the-trick-to-viewport-units-on-mobile/)
     // @ts-ignore
     const w = window.visualViewport || window; // * handle iOS keyboard

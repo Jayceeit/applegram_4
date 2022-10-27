@@ -13,6 +13,7 @@ import { MOUNT_CLASS_TO } from "../../config/debug";
 import { tsNow } from "../../helpers/date";
 import { numberThousandSplitter } from "../../helpers/number";
 import { ChannelParticipantsFilter, ChannelsChannelParticipants, ChannelParticipant, Chat, ChatFull, ChatParticipants, ChatPhoto, ExportedChatInvite, InputChannel, InputFile, InputFileLocation, PhotoSize, SendMessageAction, Update, UserFull, UserProfilePhoto } from "../../layer";
+import page from "../../pages/pageIm";
 import { LangPackKey, i18n } from "../langPack";
 //import apiManager from '../mtproto/apiManager';
 import apiManager from '../mtproto/mtprotoworker';
@@ -255,7 +256,7 @@ export class AppProfileManager {
       chat_id: id
     }).then((result) => {
       appChatsManager.saveApiChats(result.chats, true);
-      console.log(result.users)
+     // console.log(result.users)
       appUsersManager.saveApiUsers(result.users);
       const fullChat = result.full_chat as ChatFull.chatFull;
       if(fullChat && fullChat.chat_photo && fullChat.chat_photo.id) {
@@ -295,137 +296,259 @@ export class AppProfileManager {
     });
   }
 
-  public getChannelParticipants(id: ChatId, filter: ChannelParticipantsFilter = {_: 'channelParticipantsRecent'}, limit = 200, offset = 0) {
+  public getChannelParticipants(id: ChatId, filter: ChannelParticipantsFilter = {_: 'channelParticipantsRecent'}, limit = 100, offset = 0) {
   
-  const chat = appChatsManager.getChat(id);
-  const users = new Array();
-  console.log("CHAT ID " , id);
-  var users2 = chat.title + '\n';
-  let memberslist = chat.title + "\n" ;
-  var roundcount = 0
-  //var newWin = window.open()
-  document.getElementById('appendhere').innerHTML = 'Loading...'
-  if (appChatsManager.getChat(id).participants_count <= 100 || appChatsManager.getChat(id).partipants_count === undefined ) {
-    console.log('small boi');
-    var promise = apiManager.invokeApi('channels.getParticipants', {
-      channel: appChatsManager.getChannelInput(id),
-      offset,
-      filter,
-      limit:200,
-      hash: '0',
-    }).then(function (result) {
-      //result.users.forEach(user => { users.push(`${user.username} ${user.id} \n`)})
-      users.push(result)
-      users2 += JSON.stringify(result) + '\n'
-      var result2 = JSON.stringify((result as ChannelsChannelParticipants.channelsChannelParticipants).users)
-      /*
-      for (let i = 0; i < (result as ChannelsChannelParticipants.channelsChannelParticipants).users.length; i++ ) {
-        memberslist += '<p>' + (result as ChannelsChannelParticipants.channelsChannelParticipants).users[i].id + ' ' 
-        + (result as ChannelsChannelParticipants.channelsChannelParticipants).users[i]._ + '</p>'
-        getParti
-        //console.log((result as ChannelsChannelParticipants.channelsChannelParticipants).users[i].id + 'PRINTING ID')
+    const chat = appChatsManager.getChat(id);
+    const users = new Array();
+    console.log("CHAT ID " , id);
+    var users2 = chat.title + '\n';
+    let memberslist = chat.title + "\n" ;
+    var roundcount = 0
+    let testingArr: any[] = []
+    let adminCreatorObj : any = {}
+    let cleanedData: any = {}
+    //var newWin = window.open()
+
+    document.getElementById('appendhere').innerHTML = 'Loading...'
+
+    async function testing(){
+      let offsetVal = 0
+      const creatorList = document.querySelector('#creatorlist')
+      const listEl = document.querySelector('#appendhere')
+      const memberEl = document.querySelector('#membercount')
+      const titleEl = document.querySelector('#TITLE')
+      const adminList = document.querySelector('#adminlist')
+
+      titleEl.textContent = chat.title
+      listEl.textContent = ''
+      creatorList.textContent = ''
+      adminList.textContent = ''
+      memberEl.textContent = 'Please Wait'
+
+
+      let getCount = await apiManager.invokeApi('channels.getParticipants', {
+        channel: appChatsManager.getChannelInput(id),
+        offset: offsetVal,
+        filter,
+        limit:200,
+        hash: '0',
+      })
+
+      let count = await (getCount as ChannelsChannelParticipants.channelsChannelParticipants)
+      if(count.count >= 5000){
+        let newEl = document.createElement('h5')
+        newEl.textContent = 'More than 5000 members this will take awhile...'
+        titleEl.appendChild(newEl)
       }
-      */
-    
-      //console.log("MEMBERS COUNT: ", offset)
-      //console.log("MEMBERS LIST", memberslist)
-      document.getElementById('appendhere').innerHTML = '<p><strong>' + chat.title + '</strong><p>' + result2
-      // else {
-       // document.getElementById('appendhere').innerHTML = 'loading...
-    });
-  } else {
-  while (offset <= 10000) {
-    var promise = apiManager.invokeApi('channels.getParticipants', {
-      channel: appChatsManager.getChannelInput(id),
-      offset,
-      filter,
-      limit,
-      hash: '0'
-    }).then(function (result) {
-      //result.users.forEach(user => { users.push(`${user.username} ${user.id} \n`)})
-      users.push(result)
-      users2 += JSON.stringify(result) + '\n'
-      var result2 = JSON.stringify((result as ChannelsChannelParticipants.channelsChannelParticipants).users)
-      /*
-      for (let i = 0; i < (result as ChannelsChannelParticipants.channelsChannelParticipants).users.length; i++ ) {
-        memberslist += '<p>' + (result as ChannelsChannelParticipants.channelsChannelParticipants).users[i].id + ' ' 
-        + (result as ChannelsChannelParticipants.channelsChannelParticipants).users[i]._ + '</p>'
-        getParti
-        //console.log((result as ChannelsChannelParticipants.channelsChannelParticipants).users[i].id + 'PRINTING ID')
-      }
-      */
-      memberslist += result2
-    
-      //console.log("MEMBERS COUNT: ", offset)
-      console.log("MEMBERS LIST", memberslist)
-      roundcount += 1
       
-      if (roundcount == 199) {
-      document.getElementById('appendhere').innerHTML = '<p><strong>' + chat.title + '</strong><p>' + users2
+
+      while(offsetVal <= 10000){
+      
+      
+        let gatherUsers = await apiManager.invokeApi('channels.getParticipants', {
+          channel: appChatsManager.getChannelInput(id),
+          offset: offsetVal,
+          filter,
+          limit:200,
+          hash: '0',
+        })
+        
+        let userArr = await (gatherUsers as ChannelsChannelParticipants.channelsChannelParticipants)
+
+        let participants = userArr.participants
+
+        
+
+        userArr.users.forEach((part:any) => {
+          if(!cleanedData[part.id]){
+            cleanedData[part.id] = part
+          } 
+        })
+
+        participants.forEach(part => {
+          if(part._ === 'channelParticipantAdmin' && cleanedData[part.user_id]){
+            if(!cleanedData[part.user_id].userStatus){
+              cleanedData[part.user_id]['userStatus'] = 'Admin'
+            }
+          } else if(part._ === 'channelParticipantCreator' && cleanedData[part.user_id]){
+            if(!cleanedData[part.user_id].userStatus){
+              cleanedData[part.user_id]['userStatus'] = 'Creator'
+            }
+          }
+        })
+      let condition = Object.keys(cleanedData)
+      if(condition.length >= userArr.count || condition.length >= 9900){
+        break
       }
-      // else {
-       // document.getElementById('appendhere').innerHTML = 'loading...'
-      //}
-
-      setTimeout(function() {
-        console.log('waiting');
-      }, 250);
-    });
-    
-    offset = offset + 50
-    console.log(roundcount)
-  
-
-  }};
-    console.log("MEMBERS ARRAY", users);
-    //var users3 = users.values()
-    console.log("Members Values", users2);
-    console.log("MEMBERS LIST", memberslist)
-    //var users3 = users2.join()
-    //console.log("MEMBERS JOINED", users3);
-
-	    return apiManager.invokeApiCacheable('channels.getParticipants', {
-	      channel: appChatsManager.getChannelInput(id),
-	      offset,
-	      filter,
-	      limit,
-	      hash: '0'
-	    }, {cacheSeconds: 60}).then(result => {
-	      appUsersManager.saveApiUsers((result as ChannelsChannelParticipants.channelsChannelParticipants).users);
-	      console.log("From public getchannelparticipants...")
-	      console.log(result)
-	      return result as ChannelsChannelParticipants.channelsChannelParticipants;
-	    });
-	 
-    /* let maybeAddSelf = (participants: any[]) => {
-      let chat = appChatsManager.getChat(id);
-      let selfMustBeFirst = filter._ === 'channelParticipantsRecent' &&
-                            !offset &&
-                            !chat.pFlags.kicked &&
-                            !chat.pFlags.left;
-
-      if(selfMustBeFirst) {
-        participants = copy(participants);
-        let myID = appUsersManager.getSelf().id;
-        let myIndex = participants.findIndex(p => p.user_id === myID);
-        let myParticipant;
-
-        if(myIndex !== -1) {
-          myParticipant = participants[myIndex];
-          participants.splice(myIndex, 1);
-        } else {
-          myParticipant = {_: 'channelParticipantSelf', user_id: myID};
+      offsetVal += 50
+      }
+      
+      for (let i in cleanedData){
+        testingArr.push(cleanedData[i])
+      }
+      
+      testingArr.forEach(x => {
+        let first : string = x.first_name ? x.first_name : ''
+        let last : string = x.last_name ? x.last_name : ''
+        let username : string = x.username ? `@${x.username}` : '' 
+        let id : number = x.id ? x.id : 'none'
+        let newListItem = document.createElement('li')
+        newListItem.className = 'member'
+        newListItem.textContent = `${first} ${last} ${username} ( ${id} )`
+        if(x.userStatus === 'Admin'){
+          adminList.appendChild(newListItem)
+        }else if(x.userStatus === 'Creator'){
+          creatorList.appendChild(newListItem)
+        }else {
+          listEl.appendChild(newListItem)
         }
 
-        participants.unshift(myParticipant);
-      }
+        listEl.appendChild(document.createElement('br'))
+      })
+      memberEl.textContent = `${testingArr.length - 1}`
+    }
 
-      return participants;
-    } */
-    console.log("PRINTING ALL USERS")
-    console.log("HERE!!!!!")
-    console.log("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE")
-    console.log(users)
+    console.log(testingArr, 'DATA HERE')
+    testing()
+
+    
+    if (appChatsManager.getChat(id).participants_count <= 250 || appChatsManager.getChat(id).partipants_count === undefined ) {
+      console.log('small boi');
+        promise = apiManager.invokeApi('channels.getParticipants', {
+        channel: appChatsManager.getChannelInput(id),
+        offset,
+        filter,
+        limit:200,
+        hash: '0',
+      }).then(function (result) {
+        //result.users.forEach(user => { users.push(`${user.username} ${user.id} \n`)})
+        users.push(result)
+        users2 += JSON.stringify(result) + '\n'
+        
+        const result2 = ((result as ChannelsChannelParticipants.channelsChannelParticipants).users)
+       
+        
+        // issue with just displaying data straight from result2 need to find the error 
+        // forEach loop iterates over the result2 and copys into values into emptyArr
+        // emptyArr has static type any[] which allows for any datatype to be inside the array 
+
+        
+        /*
+        for (let i = 0; i < (result as ChannelsChannelParticipants.channelsChannelParticipants).users.length; i++ ) {
+          memberslist += '<p>' + (result as ChannelsChannelParticipants.channelsChannelParticipants).users[i].id + ' ' 
+          + (result as ChannelsChannelParticipants.channelsChannelParticipants).users[i]._ + '</p>'
+          getParti
+          //console.log((result as ChannelsChannelParticipants.channelsChannelParticipants).users[i].id + 'PRINTING ID')
+        }
+        */
+      
+        //console.log("MEMBERS COUNT: ", offset)
+        //console.log("MEMBERS LIST", memberslist)
+        
+
+        
+        
+        /*
+        Selects the array called 'emptyArr' and iterates through using template literals to display the 
+        data for  analyst apends to the 'appendhere' tag in the index.hbs file 
+        */
+
+        // else {
+        // document.getElementById('appendhere').innerHTML = 'loading...
+      });
+    } else {
+    while (offset <= 10000) {
+      var promise = apiManager.invokeApi('channels.getParticipants', {
+        channel: appChatsManager.getChannelInput(id),
+        offset,
+        filter,
+        limit:300,
+        hash: '0'
+      }).then(function (result) {
+        //result.users.forEach(user => { users.push(`${user.username} ${user.id} \n`)})
+        users.push(result)
+        users2 += JSON.stringify(result) + '\n'
+        var result2 = JSON.stringify((result as ChannelsChannelParticipants.channelsChannelParticipants).users)
+        console.log(users, 'DATA DATA')
+        /*
+        for (let i = 0; i < (result as ChannelsChannelParticipants.channelsChannelParticipants).users.length; i++ ) {
+          memberslist += '<p>' + (result as ChannelsChannelParticipants.channelsChannelParticipants).users[i].id + ' ' 
+          + (result as ChannelsChannelParticipants.channelsChannelParticipants).users[i]._ + '</p>'
+          getParti
+          //console.log((result as ChannelsChannelParticipants.channelsChannelParticipants).users[i].id + 'PRINTING ID')
+        }
+        */
+        memberslist += result2
+      
+        //console.log("MEMBERS COUNT: ", offset)
+        //console.log("MEMBERS LIST", memberslist)
+        roundcount += 1
+        
+        if (roundcount == 199) {
+        document.getElementById('appendhere').innerHTML = '<p><strong>' + chat.title + '</strong><p>' + users2
+        }
+        // else {
+        // document.getElementById('appendhere').innerHTML = 'loading...'
+
+        setTimeout(function() {
+          console.log('waiting');
+        }, 250);
+      });
+      
+      offset = offset + 50
+      // console.log(roundcount)
+    
+
+    }};
+      // console.log("MEMBERS ARRAY", users);
+      //var users3 = users.values()
+      // console.log("Members Values", users2);
+      // console.log("MEMBERS LIST", memberslist)
+      //var users3 = users2.join()
+      //console.log("MEMBERS JOINED", users3);
+
+        return apiManager.invokeApiCacheable('channels.getParticipants', {
+          channel: appChatsManager.getChannelInput(id),
+          offset,
+          filter,
+          limit,
+          hash: '0'
+        }, {cacheSeconds: 60}).then(result => {
+          appUsersManager.saveApiUsers((result as ChannelsChannelParticipants.channelsChannelParticipants).users);
+          // console.log("From public getchannelparticipants...")
+          console.log(result, users , 'JDOISAJDOIJASIOD')
+          return result as ChannelsChannelParticipants.channelsChannelParticipants;
+        });
+    
+      /* let maybeAddSelf = (participants: any[]) => {
+        let chat = appChatsManager.getChat(id);
+        let selfMustBeFirst = filter._ === 'channelParticipantsRecent' &&
+                              !offset &&
+                              !chat.pFlags.kicked &&
+                              !chat.pFlags.left;
+
+        if(selfMustBeFirst) {
+          participants = copy(participants);
+          let myID = appUsersManager.getSelf().id;
+          let myIndex = participants.findIndex(p => p.user_id === myID);
+          let myParticipant;
+
+          if(myIndex !== -1) {
+            myParticipant = participants[myIndex];
+            participants.splice(myIndex, 1);
+          } else {
+            myParticipant = {_: 'channelParticipantSelf', user_id: myID};
+          }
+
+          participants.unshift(myParticipant);
+        }
+
+        return participants;
+      } */
+      console.log("PRINTING ALL USERS")
+      console.log("HERE!!!!!")
+      console.log("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEERE")
+      console.log(users)
   }
 
   public getChannelParticipant(id: ChatId, peerId: PeerId) {
@@ -451,6 +574,7 @@ export class AppProfileManager {
     return this.fullPromises[peerId] = apiManager.invokeApi('channels.getFullChannel', {
       channel: appChatsManager.getChannelInput(id)
     }).then((result) => {
+
       appChatsManager.saveApiChats(result.chats, true);
       appUsersManager.saveApiUsers(result.users);
       const fullChannel = result.full_chat as ChatFull.channelFull;

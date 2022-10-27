@@ -5494,6 +5494,31 @@ export class AppMessagesManager {
 
       if(appPeersManager.isChannel(peerId)) {
         apiUpdatesManager.addChannelState(peerId.toChatId(), (historyResult as MessagesMessages.messagesChannelMessages).pts);
+        // document.addEventListener('click', evt => {
+        //   console.log(evt)
+        // })
+        // document.addEventListener('click', evt => {
+        //   console.log(evt, 'THIS HERE')
+        // })
+        // let listEl = document.querySelector('#appendhere')
+        // listEl.textContent = ''
+        // let i = 0 
+        // let groupName = document.querySelector('#TITLE')
+        // let emptyArr:any[] = []
+        // historyResult.users.forEach(x => {
+        //   emptyArr.push(x)
+        // })
+        // emptyArr.forEach(part => {
+        //   let newListEl = document.createElement('li')
+        //   newListEl.className = `${i}`
+        //   let value 
+        //   !!part.username ? value = `@${part.username}` : value = ''
+        //   newListEl.textContent = `${part.first_name} ${part.last_name} ${value} (${part.id})`
+        //   listEl.append(newListEl)
+        //   ++i
+        // })
+        // i = 0
+        
       }
 
       let length = historyResult.messages.length, count = (historyResult as MessagesMessages.messagesMessagesSlice).count;

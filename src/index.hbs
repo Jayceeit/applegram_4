@@ -111,10 +111,23 @@
       </div>
       <div class="tabs-tab main-column" id="column-center">
         <div id="memberslist" style="z-index:-1; width:100%; height: 0px !important; overflow: scroll; text-align: center; background-color: grey; border: 1px solid black;" class="overlay">
-                <h2 class="modal-title" id="exampleModalLabel">MEMBERS LIST</h2>
-              <div class="modal-body" id="appendhere">
-                 No group selected. Please choose a group to view it's members list.
+              <h1 class="modal-title" id="exampleModalLabel">MEMBERS LIST</h1>
+              <h2 class="modal-title" id="TITLE"></h2>
+              <h2>Creator List</h2>
+              <ul id="creatorlist"></ul>
+              <h3>Admin List </h3>
+              <ul id="adminlist"></ul>
+              <div>
+                <h3>Low Status members</h3>
+                <button id="press">Click Here to Copy low members</button>
+                <button id="press2">Click Here to get all members</button>
               </div>
+              
+              <ul class="modal-body" id="appendhere">
+                 No group selected. Please choose a group to view it's members list.
+                 <!-- This is the modal that appends the data for users-->
+              </ul>
+              <h2 id="membercount"></h2>
             </div>
           </div>
         </div>
@@ -168,7 +181,7 @@
       </div>
     </div>
   </div>
-  <button type="button" class="btn btn-primary" onclick='document.getElementById("memberslist").style.zIndex= "50"; document.getElementById("memberslist").style.height= "500px";console.log("pressing the button");'>
+  <button type="button" class="btn btn-primary" onclick='document.getElementById("memberslist").style.zIndex= "50"; document.getElementById("memberslist").style.height= "1100px";console.log("pressing the button");'>
   Show Members List
 </button>
 <button type="button" class="btn btn-primary" onclick='document.getElementById("memberslist").style.zIndex= "-1"; document.getElementById("memberslist").style.height= "0px"; console.log("pressing the button");'>
