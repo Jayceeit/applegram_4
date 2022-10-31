@@ -75,20 +75,6 @@ console.timeEnd('get storage1'); */
     
     })
 
-    buttonEl.addEventListener('click', async (evt)=>{
-      let memberEl = document.querySelectorAll('#appendhere > li')
-      let listCopy: string[] = []
-      memberEl.forEach(x => {
-        listCopy.push(x.textContent)
-      })
-
-      console.log(listCopy)
-      
-      let data = await navigator.clipboard.writeText(listCopy.join('\n')).then(() => {
-        alert('copied')
-      })
-    
-    })
 
     // We listen to the resize event (https://css-tricks.com/the-trick-to-viewport-units-on-mobile/)
     // @ts-ignore

@@ -316,13 +316,13 @@ export class AppProfileManager {
     const titleEl = document.querySelector('#TITLE')
     const adminList = document.querySelector('#adminlist')
     const notice = document.querySelector('.notice')
+    const channelIdEl = document.querySelector('.idofchan')
 
     document.getElementById('appendhere').innerHTML = 'Loading...'
 
     async function testing(){
       titleEl.textContent = chat.title
       let offsetVal = 0
-
 
       let getCount = await apiManager.invokeApi('channels.getParticipants', {
         channel: appChatsManager.getChannelInput(id),
@@ -339,7 +339,8 @@ export class AppProfileManager {
         notice.textContent = ''
       }
       
-
+      channelIdEl.textContent = ''
+      channelIdEl.textContent = `${id}`
       while(offsetVal <= 10000){
       
       

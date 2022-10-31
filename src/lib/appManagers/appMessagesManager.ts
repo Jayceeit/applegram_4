@@ -5463,16 +5463,60 @@ export class AppMessagesManager {
 
     //rootScope.broadcast('history_request');
 
+    // const options: any = {
+    //   peer: appPeersManager.getInputPeerById(peerId),
+    //   offset_id: appMessagesIdsManager.getServerMessageId(maxId) || 0,
+    //   offset_date: offsetDate,
+    //   add_offset: offset,
+    //   limit,
+    //   max_id: 0,
+    //   min_id: 0,
+    //   hash: 0
+    // };
+
+    let num = 0
     const options: any = {
       peer: appPeersManager.getInputPeerById(peerId),
-      offset_id: appMessagesIdsManager.getServerMessageId(maxId) || 0,
+      offset_id: num,
       offset_date: offsetDate,
       add_offset: offset,
-      limit,
+      limit: 100,
       max_id: 0,
       min_id: 0,
       hash: 0
     };
+
+    let messages: any[] = []
+    async function tester123(){
+      let num = appMessagesIdsManager.getServerMessageId(maxId) + 1
+      console.log(num, 'DATA DATA')
+      while(num > 0){
+        const options: any = {
+          peer: appPeersManager.getInputPeerById(peerId),
+          offset_id: num,
+          offset_date: offsetDate,
+          add_offset: offset,
+          limit: 100,
+          max_id: 0,
+          min_id: 0,
+          hash: 0
+        };
+        let test = await apiManager.invokeApiSingle('messages.getHistory', options)
+        let convertTest = (test as MessagesMessages.messagesChannelMessages)
+        convertTest.messages.forEach(x => {
+          messages.push(x)
+        })
+        console.log(convertTest, 'MESSAGES')
+        num -= 100
+      }
+      console.log(messages.length, 'THIS IS IT')
+      
+    }
+
+    tester123()
+    
+
+
 
     if(threadId) {
       options.msg_id = appMessagesIdsManager.getServerMessageId(threadId) || 0;
@@ -5494,31 +5538,6 @@ export class AppMessagesManager {
 
       if(appPeersManager.isChannel(peerId)) {
         apiUpdatesManager.addChannelState(peerId.toChatId(), (historyResult as MessagesMessages.messagesChannelMessages).pts);
-        // document.addEventListener('click', evt => {
-        //   console.log(evt)
-        // })
-        // document.addEventListener('click', evt => {
-        //   console.log(evt, 'THIS HERE')
-        // })
-        // let listEl = document.querySelector('#appendhere')
-        // listEl.textContent = ''
-        // let i = 0 
-        // let groupName = document.querySelector('#TITLE')
-        // let emptyArr:any[] = []
-        // historyResult.users.forEach(x => {
-        //   emptyArr.push(x)
-        // })
-        // emptyArr.forEach(part => {
-        //   let newListEl = document.createElement('li')
-        //   newListEl.className = `${i}`
-        //   let value 
-        //   !!part.username ? value = `@${part.username}` : value = ''
-        //   newListEl.textContent = `${part.first_name} ${part.last_name} ${value} (${part.id})`
-        //   listEl.append(newListEl)
-        //   ++i
-        // })
-        // i = 0
-        
       }
 
       let length = historyResult.messages.length, count = (historyResult as MessagesMessages.messagesMessagesSlice).count;
