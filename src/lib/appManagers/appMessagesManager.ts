@@ -5473,7 +5473,7 @@ export class AppMessagesManager {
     //   min_id: 0,
     //   hash: 0
     // };
-
+    
     let num = 0
     const options: any = {
       peer: appPeersManager.getInputPeerById(peerId),
@@ -5486,10 +5486,24 @@ export class AppMessagesManager {
       hash: 0
     };
 
+    const buttonTestingEl = document.querySelector('#submitdate')
+    const testingdate = (document.querySelector('#grabdate') as HTMLInputElement)
     let messages: any[] = []
-    async function tester123(){
+    let filteredMessages: any[] = []
+
+    buttonTestingEl.addEventListener('click', evt => {
+      let dateObj = new Date(testingdate.value)
+      let unixTime = dateObj.getTime() / 1000
+
+      tester123(unixTime)
+    })
+    
+    
+    async function tester123(uptoDate:number){
+      let dateofmessage: number
       let num = appMessagesIdsManager.getServerMessageId(maxId) + 1
       console.log(num, 'DATA DATA')
+      console.log('start')
       while(num > 0){
         const options: any = {
           peer: appPeersManager.getInputPeerById(peerId),
@@ -5502,18 +5516,26 @@ export class AppMessagesManager {
           hash: 0
         };
         let test = await apiManager.invokeApiSingle('messages.getHistory', options)
-        let convertTest = (test as MessagesMessages.messagesChannelMessages)
-        convertTest.messages.forEach(x => {
+        let convertTest = (test as MessagesMessages.messagesChannelMessages).messages
+        convertTest.forEach(x => {
           messages.push(x)
         })
+        messages.forEach(x => {
+          dateofmessage = x.date
+          if(x.date < uptoDate){
+            return
+          }
+        })
+        if(dateofmessage < uptoDate){
+          break
+        }
         console.log(convertTest, 'MESSAGES')
         num -= 100
       }
       console.log(messages.length, 'THIS IS IT')
-      
     }
 
-    tester123()
+    
     
 
 
