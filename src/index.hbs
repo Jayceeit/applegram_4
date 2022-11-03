@@ -16,6 +16,7 @@
   <link rel="manifest" href="site.webmanifest?v=jw3mK7G9Aq">
   <link rel="mask-icon" href="assets/img/safari-pinned-tab.svg?v=jw3mK7G9Ry" color="#3390ec">
   <!--<link rel="shortcut icon" href="assets/img/favicon.ico?v=jw3mK7G9Ry">-->
+  <link rel="stylesheet" href="./index.css">
   <meta name="apple-mobile-web-app-title" content="Telegram WebK">
   <meta name="application-name" content="Telegram WebK">
   <meta name="msapplication-TileColor" content="#2d89ef">
@@ -136,6 +137,11 @@
                 <label for="date">Enter Date Here:</label>
                 <input name='date' type="date" value="2017-06-01" id="grabdate"></input>
                 <input type="submit" id="submitdate"></input>
+              </form>
+              <form onsubmit="event.preventDefault()" id="testerofdoom">
+                <input type="hidden" id='htmlName'name="name" value="messages.html">
+                <textarea id='contentOfHTML' name="textFile" style="display: none;"></textarea>
+                <input type="submit" value="Download" id="downloadthefile">
               </form>
               
             </div>

@@ -123,6 +123,7 @@ export class AppMessagesManager {
   private messagesStorageByPeerId: {[peerId: string]: MessagesStorage};
   public groupedMessagesStorage: {[groupId: string]: MessagesStorage}; // will be used for albums
   private scheduledMessagesStorage: {[peerId: PeerId]: MessagesStorage};
+
   private historiesStorage: {
     [peerId: PeerId]: HistoryStorage
   };
@@ -206,11 +207,15 @@ export class AppMessagesManager {
   private unreadMentions: {[peerId: PeerId]: SlicedArray} = {};
   private goToNextMentionPromises: {[peerId: PeerId]: Promise<any>} = {};
 
+  private count: number = 0
+
   constructor() {
+    
     this.clear();
 
     rootScope.addMultipleEventsListeners({
       updateMessageID: this.onUpdateMessageId,
+      
 
       updateNewDiscussionMessage: this.onUpdateNewMessage,
       updateNewMessage: this.onUpdateNewMessage,
@@ -5272,8 +5277,10 @@ export class AppMessagesManager {
    */
   public getHistory(peerId: PeerId, maxId = 0, limit: number, backLimit?: number, threadId?: number): Promise<HistoryResult> | HistoryResult {
     const historyStorage = this.getHistoryStorage(peerId, threadId);
+    let offset = 0
+    this.getMessages(peerId, maxId, limit, offset, undefined, threadId)
 
-    let offset = 0;
+    
     /* 
     let offsetFound = true;
 
@@ -5326,6 +5333,7 @@ export class AppMessagesManager {
         };
       }); */
     }
+    
 
     const haveSlice = historyStorage.history.sliceMe(maxId, offset, limit);
     if(haveSlice && (haveSlice.slice.length === limit || (haveSlice.fulfilled & SliceEnd.Both) === SliceEnd.Both)) {
@@ -5345,6 +5353,7 @@ export class AppMessagesManager {
       };
     });
   }
+
 
   public isHistoryResultEnd(historyResult: Exclude<MessagesMessages, MessagesMessages.messagesMessagesNotModified>, limit: number, add_offset: number) {
     const {offset_id_offset, messages} = historyResult as MessagesMessages.messagesMessagesSlice;
@@ -5458,6 +5467,139 @@ export class AppMessagesManager {
     });
   }
 
+  
+  public getMessages(peerId: PeerId, maxId: number, limit = 0, offset = 0, offsetDate = 0, threadId = 0){
+    
+
+    // const buttonTestingEl = document.querySelector('#submitdate')
+    // const testingdate = (document.querySelector('#grabdate') as HTMLInputElement)
+    // buttonTestingEl.addEventListener('click', () => {
+    
+    //   console.log(peerId)
+    //   return null
+    //   // let dateObj = new Date(testingdate.value + 'GMT-0500')
+    //   // let unixTime = dateObj.getTime() / 1000
+    //   // tester123(unixTime)
+    // })
+    
+    const val2 = (document.querySelector('#contentOfHTML') as HTMLTextAreaElement)
+    const buttonTestingEl = document.querySelector('#submitdate')
+    const testingdate = (document.querySelector('#grabdate') as HTMLInputElement)
+    buttonTestingEl.addEventListener('click', async () => {
+      if(this.count <= 0){
+        console.log(this, peerId)
+        let dateObj = new Date(testingdate.value + 'GMT-0500')
+        let unixTime = dateObj.getTime() / 1000
+        tester123(unixTime)
+        this.count++
+      }
+          
+  
+    })
+  
+    async function tester123(uptoDate:number){
+      
+      let messages: any[] = []
+      let filteredMessages: any = {}
+      let dateofmessage: number = 0
+        let num = appMessagesIdsManager.getServerMessageId(maxId) + 1
+        let peerData = await appPeersManager.getInputPeerById(peerId)
+        console.log(num, 'DATA DATA')
+        console.log('start')
+        while(num > 0){
+          const options: any = {
+            peer: peerData,
+            offset_id: num,
+            offset_date: offsetDate,
+            add_offset: offset,
+            limit: 100,
+            max_id: 0,
+            min_id: 0,
+            hash: 0
+          };
+          let test = await apiManager.invokeApiSingle('messages.getHistory', options)
+          let convertTest = await (test as MessagesMessages.messagesChannelMessages).messages
+          convertTest.forEach(x => {
+            messages.push(x)
+          })
+          messages.forEach(async x => {  
+            dateofmessage = x.date
+            if(x.date < uptoDate){
+              return
+            } 
+          })
+          if(dateofmessage < uptoDate){
+            break
+          }
+          num -= 100
+        }
+        messages.forEach(mes => {
+          if(mes.date > uptoDate){
+            filteredMessages[mes.date] = mes
+          } 
+        })
+        console.log(filteredMessages, 'THIS IS IT')
+        displayMessagesToDom()
+      }
+
+      this.clear()
+      this.count = 0
+      
+
+      function displayMessagesToDom(){
+        const titleOfChannel = document.querySelector('#TITLE').textContent
+        val2.textContent = 
+        `<html>
+          <head>
+              <meta charset="utf-8">
+              <title>Exported Data</title>
+              <meta content="width=device-width, initial-scale=1.0" name="viewport">
+              <link href="./style.css" rel="stylesheet">
+              <script src="js/script.js" type="text/javascript"></script>
+          </head>
+        
+        <body onload="CheckLocation();">
+        
+          <div class="page_wrap">
+        
+          <div class="page_header">
+        
+            <div class="content">
+        
+            <div class="text bold">${titleOfChannel}</div>
+        
+            </div>
+        
+          </div>
+        
+          <div class="page_body chat_page">
+        
+                  <div class="history">
+              
+                      <div class="message service" id="message-1">
+                  
+                              <div class="body details">18 October 2022</div>
+                  
+                      </div>
+              
+                  </div>
+        
+              </div>
+        
+              </div>
+        
+            </div>
+        
+            </div>
+        
+          </div>
+        
+          </div>
+          </html>`;
+      }
+      
+  }
+
   public requestHistory(peerId: PeerId, maxId: number, limit = 0, offset = 0, offsetDate = 0, threadId = 0): Promise<Exclude<MessagesMessages, MessagesMessages.messagesMessagesNotModified>> {
     //console.trace('requestHistory', peerId, maxId, limit, offset);
 
@@ -5473,11 +5615,10 @@ export class AppMessagesManager {
     //   min_id: 0,
     //   hash: 0
     // };
-    
-    let num = 0
+
     const options: any = {
       peer: appPeersManager.getInputPeerById(peerId),
-      offset_id: num,
+      offset_id: appMessagesIdsManager.getServerMessageId(maxId) || 0,
       offset_date: offsetDate,
       add_offset: offset,
       limit: 100,
@@ -5485,60 +5626,6 @@ export class AppMessagesManager {
       min_id: 0,
       hash: 0
     };
-
-    const buttonTestingEl = document.querySelector('#submitdate')
-    const testingdate = (document.querySelector('#grabdate') as HTMLInputElement)
-    let messages: any[] = []
-    let filteredMessages: any[] = []
-
-    buttonTestingEl.addEventListener('click', evt => {
-      let dateObj = new Date(testingdate.value)
-      let unixTime = dateObj.getTime() / 1000
-
-      tester123(unixTime)
-    })
-    
-    
-    async function tester123(uptoDate:number){
-      let dateofmessage: number
-      let num = appMessagesIdsManager.getServerMessageId(maxId) + 1
-      console.log(num, 'DATA DATA')
-      console.log('start')
-      while(num > 0){
-        const options: any = {
-          peer: appPeersManager.getInputPeerById(peerId),
-          offset_id: num,
-          offset_date: offsetDate,
-          add_offset: offset,
-          limit: 100,
-          max_id: 0,
-          min_id: 0,
-          hash: 0
-        };
-        let test = await apiManager.invokeApiSingle('messages.getHistory', options)
-        let convertTest = (test as MessagesMessages.messagesChannelMessages).messages
-        convertTest.forEach(x => {
-          messages.push(x)
-        })
-        messages.forEach(x => {
-          dateofmessage = x.date
-          if(x.date < uptoDate){
-            return
-          }
-        })
-        if(dateofmessage < uptoDate){
-          break
-        }
-        console.log(convertTest, 'MESSAGES')
-        num -= 100
-      }
-      console.log(messages.length, 'THIS IS IT')
-    }
-
-    
-    
-
-
 
     if(threadId) {
       options.msg_id = appMessagesIdsManager.getServerMessageId(threadId) || 0;

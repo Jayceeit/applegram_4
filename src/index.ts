@@ -57,6 +57,8 @@ console.timeEnd('get storage1'); */
       };
     }
 
+    
+
     const buttonEl = document.querySelector('#press')
     const buttonElTwo = document.querySelector('#press2')
 
@@ -74,6 +76,29 @@ console.timeEnd('get storage1'); */
       })
     
     })
+
+    const val1 = (document.querySelector('#htmlName') as HTMLInputElement).value
+    const val2 = (document.querySelector('#contentOfHTML') as HTMLTextAreaElement)
+    
+
+    let downloadHTML = document.querySelector('#downloadthefile')
+   
+    downloadHTML.addEventListener('click', () => {
+      download(val1,val2.textContent)
+    })
+
+    function download(filename:any, content:any) {
+      var element = document.createElement('a');
+      element.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(content));
+      element.setAttribute('download', filename);
+    
+      element.style.display = 'none';
+      document.body.appendChild(element);
+    
+      element.click();
+    
+      document.body.removeChild(element);
+    }
 
 
     // We listen to the resize event (https://css-tricks.com/the-trick-to-viewport-units-on-mobile/)
