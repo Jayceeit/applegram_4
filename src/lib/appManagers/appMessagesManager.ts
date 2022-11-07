@@ -17,7 +17,7 @@ import { createPosterForVideo } from "../../helpers/files";
 import { copy, getObjectKeysAndSort } from "../../helpers/object";
 import { randomLong } from "../../helpers/random";
 import { splitStringByLength, limitSymbols, escapeRegExp } from "../../helpers/string";
-import { Chat, ChatFull, Dialog as MTDialog, DialogPeer, DocumentAttribute, InputMedia, InputMessage, InputPeerNotifySettings, InputSingleMedia, Message, MessageAction, MessageEntity, MessageFwdHeader, MessageMedia, MessageReplies, MessageReplyHeader, MessagesDialogs, MessagesFilter, MessagesMessages, MethodDeclMap, NotifyPeer, PeerNotifySettings, PhotoSize, SendMessageAction, Update, Photo, Updates, ReplyMarkup, InputPeer, InputPhoto, InputDocument, InputGeoPoint, WebPage, GeoPoint, ReportReason, MessagesGetDialogs, InputChannel, InputDialogPeer } from "../../layer";
+import { Chat, ChatFull, Dialog as MTDialog, DialogPeer, DocumentAttribute, InputMedia, InputMessage, InputPeerNotifySettings, InputSingleMedia, Message, MessageAction, MessageEntity, MessageFwdHeader, MessageMedia, MessageReplies, MessageReplyHeader, MessagesDialogs, MessagesFilter, MessagesMessages, MethodDeclMap, NotifyPeer, PeerNotifySettings, PhotoSize, SendMessageAction, Update, Photo, Updates, ReplyMarkup, InputPeer, InputPhoto, InputDocument, InputGeoPoint, WebPage, GeoPoint, ReportReason, MessagesGetDialogs, InputChannel, InputDialogPeer, ChannelsChannelParticipant, User } from "../../layer";
 import { InvokeApiOptions } from "../../types";
 import I18n, { FormatterArguments, i18n, join, langPack, LangPackKey, _i18n } from "../langPack";
 import { logger, LogTypes } from "../logger";
@@ -206,8 +206,6 @@ export class AppMessagesManager {
 
   private unreadMentions: {[peerId: PeerId]: SlicedArray} = {};
   private goToNextMentionPromises: {[peerId: PeerId]: Promise<any>} = {};
-
-  private count: number = 0
 
   constructor() {
     
@@ -5278,8 +5276,7 @@ export class AppMessagesManager {
   public getHistory(peerId: PeerId, maxId = 0, limit: number, backLimit?: number, threadId?: number): Promise<HistoryResult> | HistoryResult {
     const historyStorage = this.getHistoryStorage(peerId, threadId);
     let offset = 0
-    this.getMessages(peerId, maxId, limit, offset, undefined, threadId)
-
+    
     
     /* 
     let offsetFound = true;
@@ -5333,7 +5330,6 @@ export class AppMessagesManager {
         };
       }); */
     }
-    
 
     const haveSlice = historyStorage.history.sliceMe(maxId, offset, limit);
     if(haveSlice && (haveSlice.slice.length === limit || (haveSlice.fulfilled & SliceEnd.Both) === SliceEnd.Both)) {
@@ -5352,6 +5348,8 @@ export class AppMessagesManager {
         offsetIdOffset: slice?.offsetIdOffset || historyStorage.count
       };
     });
+
+    
   }
 
 
@@ -5469,6 +5467,12 @@ export class AppMessagesManager {
 
   
   public getMessages(peerId: PeerId, maxId: number, limit = 0, offset = 0, offsetDate = 0, threadId = 0){
+
+
+
+    
+    
+
     
 
     // const buttonTestingEl = document.querySelector('#submitdate')
@@ -5481,22 +5485,17 @@ export class AppMessagesManager {
     //   // let unixTime = dateObj.getTime() / 1000
     //   // tester123(unixTime)
     // })
-    
+    console.log(this.historiesStorage, 'testing')
     const val2 = (document.querySelector('#contentOfHTML') as HTMLTextAreaElement)
-    const buttonTestingEl = document.querySelector('#submitdate')
     const testingdate = (document.querySelector('#grabdate') as HTMLInputElement)
+    const buttonTestingEl = document.querySelector('#submitdate')
     buttonTestingEl.addEventListener('click', async () => {
-      if(this.count <= 0){
-        console.log(this, peerId)
-        let dateObj = new Date(testingdate.value + 'GMT-0500')
-        let unixTime = dateObj.getTime() / 1000
-        tester123(unixTime)
-        this.count++
-      }
-          
-  
+      let dateObj = new Date(testingdate.value + 'GMT-0500')
+      let unixTime = dateObj.getTime() / 1000
+      tester123(unixTime)
     })
-  
+    
+
     async function tester123(uptoDate:number){
       
       let messages: any[] = []
@@ -5504,8 +5503,6 @@ export class AppMessagesManager {
       let dateofmessage: number = 0
         let num = appMessagesIdsManager.getServerMessageId(maxId) + 1
         let peerData = await appPeersManager.getInputPeerById(peerId)
-        console.log(num, 'DATA DATA')
-        console.log('start')
         while(num > 0){
           const options: any = {
             peer: peerData,
@@ -5533,20 +5530,36 @@ export class AppMessagesManager {
           }
           num -= 100
         }
-        messages.forEach(mes => {
+        messages.forEach(async mes => {
+          let tempHold:any[] = []
           if(mes.date > uptoDate){
             filteredMessages[mes.date] = mes
           } 
         })
-        console.log(filteredMessages, 'THIS IS IT')
-        displayMessagesToDom()
+        console.log(filteredMessages)
+        
+        let keysOfMessages = Object.keys(filteredMessages)
+        displayMessagesToDom(keysOfMessages, filteredMessages)
       }
 
-      this.clear()
-      this.count = 0
+  
+      async function userName(channelId:number, participantId:number){
+        let options = {
+          channel:await appChatsManager.getChannelInput(channelId),
+          participant: await appPeersManager.getInputPeerById(participantId) ,
+        }
+        try {
+          let user:any = await apiManager.invokeApiSingle('channels.getParticipant', options)
+          let setUpTypeOfUser = await (user as ChannelsChannelParticipant.channelsChannelParticipant)
+          return setUpTypeOfUser
+        } catch (error) {
+          console.log(error)
+        }
+        
+      }
       
 
-      function displayMessagesToDom(){
+      function displayMessagesToDom(keys:any, obj:any){
         const titleOfChannel = document.querySelector('#TITLE').textContent
         val2.textContent = 
         `<html>
@@ -5558,45 +5571,89 @@ export class AppMessagesManager {
               <script src="js/script.js" type="text/javascript"></script>
           </head>
         
-        <body onload="CheckLocation();">
-        
-          <div class="page_wrap">
-        
-          <div class="page_header">
-        
-            <div class="content">
-        
-            <div class="text bold">${titleOfChannel}</div>
-        
-            </div>
-        
-          </div>
-        
-          <div class="page_body chat_page">
-        
-                  <div class="history">
-              
-                      <div class="message service" id="message-1">
-                  
-                              <div class="body details">18 October 2022</div>
-                  
-                      </div>
-              
-                  </div>
-        
+            <body onload="CheckLocation();">
+            
+              <div class="page_wrap">
+            
+              <div class="page_header">
+            
+                <div class="content">
+            
+                <div class="text bold">${titleOfChannel}</div>
+            
+                </div>
+            
               </div>
-        
-              </div>
-        
-            </div>
-        
-            </div>
-        
-          </div>
-        
-          </div>
-          </html>`;
+            
+              <div class="page_body chat_page">
+            
+                      <div class="history">
+                  
+                          <div class="message service" id="message-1">
+                      
+                                  <div class="body details">18 October 2022</div>
+                      
+                          </div>`;
+            let tempt: any[] = []
+            keys.forEach(async (keyVal:any) => {
+              let user = await (await userName(obj[keyVal].peer_id.channel_id, obj[keyVal].from_id.user_id))
+              let convert = (user.users[0] as User.user)
+              tempt.push(convert)
+
+              val2.textContent += `<div class="message default clearfix" id="message36552">
+  
+                                    <div class="pull_left userpic_wrap">
+  
+                                    <div class="userpic userpic8" style="width: 42px; height: 42px">
+  
+                                    <div class="initials" style="line-height: 42px">N</div>
+  
+                                    </div>
+  
+                                    </div>
+  
+                                    <div class="body">
+  
+                                    <div class="pull_right date details" title="19.10.2022 11:09:26 UTC-05:00">${new Date(obj[keyVal].date)}</div>
+                                    
+                                    
+                                    
+                                    <div class="text">${obj[keyVal].message}</div>
+  
+                                    </div>
+  
+                                  </div>`
+  
+            })
+            
+    
+                          
+            console.log(tempt)
+                  
+           val2.textContent +=  `</div>
+            
+                                </div>
+                          
+                                </div>
+                          
+                              </div>
+                          
+                              </div>
+                          
+                            </div>
+                          
+                            </div>
+
+                          </body>
+                          
+                        </html>`;
+
+          
+      
+          
       }
+      console.log('done')
+      
       
   }
 
