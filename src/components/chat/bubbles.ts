@@ -1319,7 +1319,7 @@ export default class ChatBubbles {
         this.log('load more', this.scrollable.scrollHeight, this.scrollable.scrollTop, this.scrollable);
         return;
       } */
-      /* false &&  */this.getHistory(history[0], true, undefined, undefined, justLoad);
+      /* false &&  *///this.getHistory(history[0], true, undefined, undefined, justLoad);
     } else {
       //let dialog = this.appMessagesManager.getDialogByPeerId(this.peerId)[0];
       const historyStorage = this.appMessagesManager.getHistoryStorage(this.peerId, this.chat.threadId);

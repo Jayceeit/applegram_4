@@ -5274,61 +5274,15 @@ export class AppMessagesManager {
    * * https://core.telegram.org/api/offsets, offset_id is inclusive
    */
   public getHistory(peerId: PeerId, maxId = 0, limit: number, backLimit?: number, threadId?: number): Promise<HistoryResult> | HistoryResult {
+    this.getMessages(peerId, maxId, 0,0,threadId)
+    console.log(peerId, 'HERE HERE ')
     const historyStorage = this.getHistoryStorage(peerId, threadId);
     let offset = 0
     
     
-    /* 
-    let offsetFound = true;
-
-    if(maxId) {
-      offsetFound = false;
-      for(; offset < historyStorage.history.length; offset++) {
-        if(maxId > historyStorage.history.slice[offset]) {
-          offsetFound = true;
-          break;
-        }
-      }
-    }
-
-    if(offsetFound && (
-      historyStorage.count !== null && historyStorage.history.length === historyStorage.count ||
-      historyStorage.history.length >= offset + limit
-      )) {
-      if(backLimit) {
-        backLimit = Math.min(offset, backLimit);
-        offset = Math.max(0, offset - backLimit);
-        limit += backLimit;
-      } else {
-        limit = limit;
-      }
-
-      const history = historyStorage.history.slice.slice(offset, offset + limit);
-      return {
-        count: historyStorage.count,
-        history: history,
-        offsetIdOffset: offset
-      };
-    }
-
-    if(offsetFound) {
-      offset = 0;
-    } */
-
     if(backLimit) {
       offset = -backLimit;
       limit += backLimit;
-
-      /* return this.requestHistory(reqPeerId, maxId, limit, offset, undefined, threadId).then((historyResult) => {
-        historyStorage.count = (historyResult as MessagesMessages.messagesMessagesSlice).count || historyResult.messages.length;
-
-        const history = (historyResult.messages as MyMessage[]).map(message => message.mid);
-        return {
-          count: historyStorage.count,
-          history,
-          offsetIdOffset: (historyResult as MessagesMessages.messagesMessagesSlice).offset_id_offset || 0
-        };
-      }); */
     }
 
     const haveSlice = historyStorage.history.sliceMe(maxId, offset, limit);
@@ -5470,192 +5424,230 @@ export class AppMessagesManager {
 
 
 
-    
-    
-
-    
-
-    // const buttonTestingEl = document.querySelector('#submitdate')
-    // const testingdate = (document.querySelector('#grabdate') as HTMLInputElement)
-    // buttonTestingEl.addEventListener('click', () => {
-    
-    //   console.log(peerId)
-    //   return null
-    //   // let dateObj = new Date(testingdate.value + 'GMT-0500')
-    //   // let unixTime = dateObj.getTime() / 1000
-    //   // tester123(unixTime)
-    // })
-    console.log(this.historiesStorage, 'testing')
     const val2 = (document.querySelector('#contentOfHTML') as HTMLTextAreaElement)
     const testingdate = (document.querySelector('#grabdate') as HTMLInputElement)
     const buttonTestingEl = document.querySelector('#submitdate')
-    buttonTestingEl.addEventListener('click', async () => {
+    buttonTestingEl.addEventListener('click', () => {
       let dateObj = new Date(testingdate.value + 'GMT-0500')
       let unixTime = dateObj.getTime() / 1000
-      tester123(unixTime)
+      retrieveSpecificMsg(unixTime)
+      return
     })
     
 
-    async function tester123(uptoDate:number){
+    async function retrieveSpecificMsg(uptoDate:number){
+        let peerIdUpdated = document.querySelector('#channelId') as HTMLInputElement
       
-      let messages: any[] = []
-      let filteredMessages: any = {}
-      let dateofmessage: number = 0
+        let messages: any[] = []
+        let filteredMessages: any = {}
+        let dateofmessage: number = 0
         let num = appMessagesIdsManager.getServerMessageId(maxId) + 1
-        let peerData = await appPeersManager.getInputPeerById(peerId)
+        let peerData = await appPeersManager.getInputPeerById(Number(-peerIdUpdated.value))
         while(num > 0){
-          const options: any = {
-            peer: peerData,
-            offset_id: num,
-            offset_date: offsetDate,
-            add_offset: offset,
-            limit: 100,
-            max_id: 0,
-            min_id: 0,
-            hash: 0
-          };
+          const options: any = {peer: peerData, offset_id: num, offset_date: offsetDate, add_offset: offset, limit: 100, max_id: 0, min_id: 0, hash: 0};
           let test = await apiManager.invokeApiSingle('messages.getHistory', options)
           let convertTest = await (test as MessagesMessages.messagesChannelMessages).messages
-          convertTest.forEach(x => {
-            messages.push(x)
-          })
-          messages.forEach(async x => {  
+          convertTest.forEach(x => messages.push(x))
+          messages.forEach(x => {  
             dateofmessage = x.date
-            if(x.date < uptoDate){
-              return
-            } 
+            if(x.date < uptoDate)return
           })
-          if(dateofmessage < uptoDate){
-            break
-          }
+          if(dateofmessage < uptoDate)break;
           num -= 100
         }
-        messages.forEach(async mes => {
-          let tempHold:any[] = []
-          if(mes.date > uptoDate){
-            filteredMessages[mes.date] = mes
-          } 
+        messages.forEach(mes => {
+          if(mes.date > uptoDate)filteredMessages[mes.date] = mes
         })
-        console.log(filteredMessages)
-        
         let keysOfMessages = Object.keys(filteredMessages)
         displayMessagesToDom(keysOfMessages, filteredMessages)
       }
 
   
-      async function userName(channelId:number, participantId:number){
-        let options = {
-          channel:await appChatsManager.getChannelInput(channelId),
-          participant: await appPeersManager.getInputPeerById(participantId) ,
+    async function userName(channelId:number, participantId:number){
+      let options = {
+        channel:await appChatsManager.getChannelInput(channelId),
+        participant: await appPeersManager.getInputPeerById(participantId) ,
+      }
+      try {
+        let user:any = await apiManager.invokeApiSingle('channels.getParticipant', options)
+        let setUpTypeOfUser = await (user as ChannelsChannelParticipant.channelsChannelParticipant)
+        return setUpTypeOfUser
+      } catch (error) {
+        console.log(error)
+      }
+    }
+      
+
+    function displayMessagesToDom(keys:any, obj:any){
+      let users:any = {}
+      const getUsers = (document.querySelectorAll('.member') as NodeList) 
+      getUsers.forEach(x => {
+        let arrOfUser = x.textContent.split(' ')
+        if(!users[`${arrOfUser[arrOfUser.length - 2]}`]){
+          users[`${arrOfUser[arrOfUser.length - 2]}`] = {name: arrOfUser[0], id:arrOfUser[arrOfUser.length - 2]}
         }
+      })
+
+      const titleOfChannel = document.querySelector('#TITLE').textContent
+
+      const createHtmlEl = document.createElement('html')
+
+      const createHeadEl = document.createElement('head')
+
+      const createMetaEl = document.createElement('meta')
+      createMetaEl.setAttribute('charset', 'utf-8')
+
+      const secondMetaEl = document.createElement('meta')
+      secondMetaEl.setAttribute('content', 'width=device-width')
+      secondMetaEl.setAttribute('inital-scale','1.0')
+      secondMetaEl.setAttribute('name', 'viewport')
+
+      const createLinkEl = document.createElement('link')
+      createLinkEl.setAttribute('href', './style.css')
+      createLinkEl.setAttribute('rel', 'stylesheet')
+
+      const createScriptEl = document.createElement('script')
+      createScriptEl.setAttribute('src','js/script.js' )
+      createScriptEl.setAttribute('type', 'text/javascript')
+
+      createHeadEl.appendChild(createScriptEl)
+      createHeadEl.appendChild(createLinkEl)
+      createHeadEl.appendChild(createMetaEl)
+      createHeadEl.appendChild(secondMetaEl)
+      createHeadEl.appendChild(createMetaEl)
+      createHtmlEl.appendChild(createHeadEl)
+
+      const bodyEl = document.createElement('body')
+      bodyEl.setAttribute('onload', 'Checklocation()')
+
+      const pageWrapDivEl = document.createElement('div')
+      pageWrapDivEl.className = 'page_wrap'
+
+      const pageHeaderDivEl = document.createElement('div')
+      pageHeaderDivEl.className = 'page_header'
+
+      const contentDiv = document.createElement('div')
+      contentDiv.className = 'content'
+
+      const titleDiv = document.createElement('div')
+      titleDiv.className = 'text bold'
+      titleDiv.textContent = titleOfChannel
+
+      contentDiv.appendChild(titleDiv)
+      pageHeaderDivEl.appendChild(contentDiv)
+      pageWrapDivEl.appendChild(pageHeaderDivEl)
+      bodyEl.appendChild(pageWrapDivEl)
+      
+
+
+      const pageBodypageChatDivEl = document.createElement('div')
+      pageBodypageChatDivEl.className = 'page_body chat_page'
+
+      const historyDivEl = document.createElement('div')
+      historyDivEl.className = 'history'
+
+      pageBodypageChatDivEl.appendChild(historyDivEl)
+
+      bodyEl.appendChild(pageBodypageChatDivEl)
+
+      createHtmlEl.appendChild(bodyEl)
+      
+      let userData:any = []
+      let names:any = {}
+      console.log(obj)
+      keys.forEach(async (keyVal:any) => {
+        
         try {
-          let user:any = await apiManager.invokeApiSingle('channels.getParticipant', options)
-          let setUpTypeOfUser = await (user as ChannelsChannelParticipant.channelsChannelParticipant)
-          return setUpTypeOfUser
+          let user = await userName(obj[keyVal].peer_id.channel_id, obj[keyVal].from_id.user_id)
+          let convert = user.users[0] as User.user
+          names[user.users[0].id] = convert.username
         } catch (error) {
           console.log(error)
         }
+
         
-      }
+      })
       
-
-      function displayMessagesToDom(keys:any, obj:any){
-        const titleOfChannel = document.querySelector('#TITLE').textContent
-        val2.textContent = 
-        `<html>
-          <head>
-              <meta charset="utf-8">
-              <title>Exported Data</title>
-              <meta content="width=device-width, initial-scale=1.0" name="viewport">
-              <link href="./style.css" rel="stylesheet">
-              <script src="js/script.js" type="text/javascript"></script>
-          </head>
-        
-            <body onload="CheckLocation();">
-            
-              <div class="page_wrap">
-            
-              <div class="page_header">
-            
-                <div class="content">
-            
-                <div class="text bold">${titleOfChannel}</div>
-            
-                </div>
-            
-              </div>
-            
-              <div class="page_body chat_page">
-            
-                      <div class="history">
-                  
-                          <div class="message service" id="message-1">
-                      
-                                  <div class="body details">18 October 2022</div>
-                      
-                          </div>`;
-            let tempt: any[] = []
-            keys.forEach(async (keyVal:any) => {
-              let user = await (await userName(obj[keyVal].peer_id.channel_id, obj[keyVal].from_id.user_id))
-              let convert = (user.users[0] as User.user)
-              tempt.push(convert)
-
-              val2.textContent += `<div class="message default clearfix" id="message36552">
-  
-                                    <div class="pull_left userpic_wrap">
-  
-                                    <div class="userpic userpic8" style="width: 42px; height: 42px">
-  
-                                    <div class="initials" style="line-height: 42px">N</div>
-  
-                                    </div>
-  
-                                    </div>
-  
-                                    <div class="body">
-  
-                                    <div class="pull_right date details" title="19.10.2022 11:09:26 UTC-05:00">${new Date(obj[keyVal].date)}</div>
-                                    
-                                    
-                                    
-                                    <div class="text">${obj[keyVal].message}</div>
-  
-                                    </div>
-  
-                                  </div>`
-  
-            })
-            
     
-                          
-            console.log(tempt)
-                  
-           val2.textContent +=  `</div>
-            
-                                </div>
-                          
-                                </div>
-                          
-                              </div>
-                          
-                              </div>
-                          
-                            </div>
-                          
-                            </div>
+      keys.forEach(async (keyVal:any) => {
+    
+          if(obj[keyVal].hasOwnProperty('from_id') && obj[keyVal].from_id.hasOwnProperty('user_id')){
+            console.log(users, users[`${obj[keyVal].from_id.user_id}`])
+            userData.push({name: users[obj[keyVal].from_id.user_id].name ? users[obj[keyVal].from_id.user_id].name : '', msg:obj[keyVal].message, date: obj[keyVal].date})
+          } else {
 
-                          </body>
-                          
-                        </html>`;
+          }
+          // console.log(await users(obj[keyVal].peer_id.channel_id, obj[keyVal].from_id.user_id))
+    
+           
+          })
+          
+    userData.sort((a:any,b:any) => b.date - a.date)
+    console.table(userData)
+    userData.forEach((x:any) => {
+      try {
+        let date = new Date(x.date * 1000)
+        const messageDefaultDivEl = document.createElement('div')
+        messageDefaultDivEl.className = 'message default clearfix'
+              // messageDefaultDivEl.setAttribute('id', `message${}`)
+        const userPicWrapDivEl = document.createElement('div')
+        userPicWrapDivEl.className = 'pull_left userpic_wrap'
 
-          
-      
-          
+        const userPicDivEl = document.createElement('div')
+        userPicDivEl.className = 'userpic userpic8'
+        userPicDivEl.setAttribute('style', 'width: 42px; height: 42px')
+
+
+        const userInitialsDivEl = document.createElement('div')
+        userInitialsDivEl.className = 'initials'
+        userInitialsDivEl.setAttribute('style', 'line-height: 42px')
+        userInitialsDivEl.textContent = x.name ? x.name.slice(0,1) : ''
+
+
+        userPicDivEl.appendChild(userInitialsDivEl)
+        userPicWrapDivEl.appendChild(userPicDivEl)
+        messageDefaultDivEl.appendChild(userPicWrapDivEl)
+
+
+
+        const bodyDivMsg = document.createElement('div')
+        bodyDivMsg.className = 'body'
+
+        const nameDivEl = document.createElement('div')
+        nameDivEl.className = 'from_name'
+        nameDivEl.textContent = x.name !== undefined ? x.name : 'Name N/A'
+        
+
+
+        const timeDivEl = document.createElement('div')
+        timeDivEl.setAttribute('title', `${date.getUTCDate()}}`)
+        timeDivEl.className = 'pull_right date details'
+        timeDivEl.textContent = `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`
+
+        const msgDivEl = document.createElement('div')
+        msgDivEl.className = 'text'
+        msgDivEl.textContent = x.msg !== '' ? x.msg : 'MEDIA IS LOCATED HERE'
+
+        bodyDivMsg.appendChild(timeDivEl)
+        bodyDivMsg.appendChild(nameDivEl)
+        bodyDivMsg.appendChild(msgDivEl)
+        
+        messageDefaultDivEl.appendChild(bodyDivMsg)
+        historyDivEl.appendChild(messageDefaultDivEl)
+      } catch (error) {
+        console.log(error)
       }
-      console.log('done')
+      val2.textContent = createHtmlEl.innerHTML
+      console.log('completed')  
       
-      
+    })
+
+
+    
+  
+         
   }
+}
 
   public requestHistory(peerId: PeerId, maxId: number, limit = 0, offset = 0, offsetDate = 0, threadId = 0): Promise<Exclude<MessagesMessages, MessagesMessages.messagesMessagesNotModified>> {
     //console.trace('requestHistory', peerId, maxId, limit, offset);

@@ -70,6 +70,9 @@ export type ApiError = Partial<{
 } */
 
 export class ApiManager {
+  invokeApiSingle(arg0: string, options: any) {
+      throw new Error("Method not implemented.");
+  }
   private cachedNetworkers: {
     [transportType in TransportType]: {
       [connectionType in ConnectionType]: {

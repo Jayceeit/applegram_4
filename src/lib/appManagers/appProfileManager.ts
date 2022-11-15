@@ -295,9 +295,11 @@ export class AppProfileManager {
       });
     });
   }
+  
+  
 
   public getChannelParticipants(id: ChatId, filter: ChannelParticipantsFilter = {_: 'channelParticipantsRecent'}, limit = 100, offset = 0) {
-  
+    
     const chat = appChatsManager.getChat(id);
     const users = new Array();
     console.log("CHAT ID " , id);
@@ -307,7 +309,6 @@ export class AppProfileManager {
     let testingArr: any[] = []
     let adminCreatorObj : any = {}
     let cleanedData: any = {}
-    let doubleFilter : any = {}
     let testinInt = 0
     //var newWin = window.open()
     const creatorList = document.querySelector('#creatorlist')
@@ -320,9 +321,11 @@ export class AppProfileManager {
 
     document.getElementById('appendhere').innerHTML = 'Loading...'
 
+    let offsetVal = 0
+
     async function testing(){
       titleEl.textContent = chat.title
-      let offsetVal = 0
+      
 
       let getCount = await apiManager.invokeApi('channels.getParticipants', {
         channel: appChatsManager.getChannelInput(id),
@@ -333,6 +336,7 @@ export class AppProfileManager {
       })
 
       let count = await (getCount as ChannelsChannelParticipants.channelsChannelParticipants)
+
       if(count.count >= 5000){
         notice.textContent = 'More than 5000 users this will take awhile...'
       } else {
@@ -341,52 +345,181 @@ export class AppProfileManager {
       
       channelIdEl.textContent = ''
       channelIdEl.textContent = `${id}`
-      while(offsetVal <= 10000){
-      
-      
-        let gatherUsers = await apiManager.invokeApi('channels.getParticipants', {
-          channel: appChatsManager.getChannelInput(id),
-          offset: offsetVal,
-          filter,
-          limit:200,
-          hash: '0',
-        })
-        
-        let userArr = await (gatherUsers as ChannelsChannelParticipants.channelsChannelParticipants)
 
-        let participants = userArr.participants
+    
+      let stringArr = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '_', '?',
+      '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', '!', '$', '<', '>', '"', "'", ';', '/', '{', '}', '|', '+', '=', '-', '', '~', '`', '.', '\\', '*']
+      let i = 0
+      if(count.count >= 1000){
+        while(i < stringArr.length - 1){
 
-        
-
-        userArr.users.forEach((part:any) => {
-          if(!cleanedData[part.id]){
-            cleanedData[part.id] = part
+          let currentNumber = Object.keys(cleanedData).length
             
-          } 
-        })
-
-        participants.forEach(part => {
-          if(part._ === 'channelParticipantAdmin' && cleanedData[part.user_id]){
-            if(!cleanedData[part.user_id].userStatus){
-              cleanedData[part.user_id]['userStatus'] = 'Admin'
+          let gatherUsers = await apiManager.invokeApi('channels.getParticipants', {
+            channel: appChatsManager.getChannelInput(id),
+            offset: offsetVal,
+            filter: {
+              _:'channelParticipantsSearch',
+              q:stringArr[i]
+            },
+            limit:200,
+            hash: '0',
+          })
+            
+          if(offsetVal >= 5000){
+            offsetVal = 0
+            i++
+          }else{
+            let userArr = await (gatherUsers as ChannelsChannelParticipants.channelsChannelParticipants)
+    
+            let participants = userArr.participants
+      
+            
+      
+            userArr.users.forEach((part:any) => {
+              if(!cleanedData[part.id]){
+                cleanedData[part.id] = part
+                
+              } 
+            })
+      
+            participants.forEach(part => {
+              if(part._ === 'channelParticipantAdmin' && cleanedData[part.user_id]){
+                if(!cleanedData[part.user_id].userStatus){
+                  cleanedData[part.user_id]['userStatus'] = 'Admin'
+                }
+              } else if(part._ === 'channelParticipantCreator' && cleanedData[part.user_id]){
+                if(!cleanedData[part.user_id].userStatus){
+                  cleanedData[part.user_id]['userStatus'] = 'Creator'
+                }
+              }
+            })
+            console.log(currentNumber, Object.keys(cleanedData).length, 'COMPARISON')
+            if(currentNumber === Object.keys(cleanedData).length){
+              offsetVal = 0
+              i++
+            }else{
+              console.log(Object.keys(cleanedData).length)
+              offsetVal += 50
             }
-          } else if(part._ === 'channelParticipantCreator' && cleanedData[part.user_id]){
-            if(!cleanedData[part.user_id].userStatus){
-              cleanedData[part.user_id]['userStatus'] = 'Creator'
+    
+            if(count.count <= Object.keys(cleanedData).length){
+              break
             }
+            // if(condition.length >= userArr.count || condition.length >= 9900){
+            //   break
+            // }
           }
-        })
-      let condition = Object.keys(cleanedData)
-      if(condition.length >= userArr.count || condition.length >= 9900){
-        break
+          
+          }
+          offsetVal = 0 
+          while(offsetVal < 5000){
+    
+            let currentNumber = Object.keys(cleanedData).length
+              
+            let gatherUsers = await apiManager.invokeApi('channels.getParticipants', {
+              channel: appChatsManager.getChannelInput(id),
+              offset: offsetVal,
+              filter,
+              limit:200,
+              hash: '0',
+            })
+              
+              let userArr = await (gatherUsers as ChannelsChannelParticipants.channelsChannelParticipants)
+      
+              let participants = userArr.participants
+        
+              
+        
+              userArr.users.forEach((part:any) => {
+                if(!cleanedData[part.id]){
+                  cleanedData[part.id] = part
+                }
+              })
+        
+              participants.forEach(part => {
+                if(part._ === 'channelParticipantAdmin' && cleanedData[part.user_id]){
+                  if(!cleanedData[part.user_id].userStatus){
+                    cleanedData[part.user_id]['userStatus'] = 'Admin'
+                  }
+                } else if(part._ === 'channelParticipantCreator' && cleanedData[part.user_id]){
+                  if(!cleanedData[part.user_id].userStatus){
+                    cleanedData[part.user_id]['userStatus'] = 'Creator'
+                  }
+                }
+              })
+              console.log(currentNumber, Object.keys(cleanedData).length, 'COMPARISON')
+              offsetVal += 50
+              
+      
+              if(count.count <= Object.keys(cleanedData).length){
+                break
+              }
+              // if(condition.length >= userArr.count || condition.length >= 9900){
+              //   break
+              // }
+            
+            
+            
+            
+            } 
+
+
+      }else if(count.count <= 10000){
+        while(offsetVal < 10000){
+    
+            let currentNumber = Object.keys(cleanedData).length
+              
+            let gatherUsers = await apiManager.invokeApi('channels.getParticipants', {
+              channel: appChatsManager.getChannelInput(id),
+              offset: offsetVal,
+              filter,
+              limit:200,
+              hash: '0',
+            })
+              
+              let userArr = await (gatherUsers as ChannelsChannelParticipants.channelsChannelParticipants)
+      
+              let participants = userArr.participants
+        
+              
+        
+              userArr.users.forEach((part:any) => {
+                if(!cleanedData[part.id]){
+                  cleanedData[part.id] = part
+                }
+              })
+        
+              participants.forEach(part => {
+                if(part._ === 'channelParticipantAdmin' && cleanedData[part.user_id]){
+                  if(!cleanedData[part.user_id].userStatus){
+                    cleanedData[part.user_id]['userStatus'] = 'Admin'
+                  }
+                } else if(part._ === 'channelParticipantCreator' && cleanedData[part.user_id]){
+                  if(!cleanedData[part.user_id].userStatus){
+                    cleanedData[part.user_id]['userStatus'] = 'Creator'
+                  }
+                }
+              })
+              console.log(currentNumber, Object.keys(cleanedData).length, 'COMPARISON')
+              offsetVal += 50
+              
+      
+              if(count.count <= Object.keys(cleanedData).length){
+                break
+              }
       }
-      offsetVal += 50
-      }
+    }
+      
+
+
       
       for (let i in cleanedData){
         testingArr.push(cleanedData[i])
       }
       displayContent()
+      console.log(testingArr)
+      console.table(testingArr)
       
     }
     
