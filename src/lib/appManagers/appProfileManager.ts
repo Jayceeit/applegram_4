@@ -350,7 +350,7 @@ export class AppProfileManager {
       let stringArr = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '_', '?',
       '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', '!', '$', '<', '>', '"', "'", ';', '/', '{', '}', '|', '+', '=', '-', '', '~', '`', '.', '\\', '*']
       let i = 0
-      if(count.count >= 1000){
+      if(count.count >= 10000){
         while(i < stringArr.length - 1){
 
           let currentNumber = Object.keys(cleanedData).length
@@ -465,7 +465,7 @@ export class AppProfileManager {
             } 
 
 
-      }else if(count.count <= 10000){
+      }else if(count.count < 10000){
         while(offsetVal < 10000){
     
             let currentNumber = Object.keys(cleanedData).length

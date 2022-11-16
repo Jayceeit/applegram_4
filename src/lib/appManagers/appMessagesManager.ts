@@ -5429,7 +5429,10 @@ export class AppMessagesManager {
     const buttonTestingEl = document.querySelector('#submitdate')
     buttonTestingEl.addEventListener('click', () => {
       let dateObj = new Date(testingdate.value + 'GMT-0500')
+      
       let unixTime = dateObj.getTime() / 1000
+
+      console.log(dateObj, unixTime)
       retrieveSpecificMsg(unixTime)
       return
     })
@@ -5555,18 +5558,18 @@ export class AppMessagesManager {
       let userData:any = []
       let names:any = {}
       console.log(obj)
-      keys.forEach(async (keyVal:any) => {
+      // keys.forEach(async (keyVal:any) => {
         
-        try {
-          let user = await userName(obj[keyVal].peer_id.channel_id, obj[keyVal].from_id.user_id)
-          let convert = user.users[0] as User.user
-          names[user.users[0].id] = convert.username
-        } catch (error) {
-          console.log(error)
-        }
+      //   try {
+      //     let user = await userName(obj[keyVal].peer_id.channel_id, obj[keyVal].from_id.user_id)
+      //     let convert = user.users[0] as User.user
+      //     names[user.users[0].id] = convert.username
+      //   } catch (error) {
+      //     console.log(error)
+      //   }
 
         
-      })
+      // })
       
     
       keys.forEach(async (keyVal:any) => {
@@ -5583,7 +5586,6 @@ export class AppMessagesManager {
           })
           
     userData.sort((a:any,b:any) => b.date - a.date)
-    console.table(userData)
     userData.forEach((x:any) => {
       try {
         let date = new Date(x.date * 1000)
