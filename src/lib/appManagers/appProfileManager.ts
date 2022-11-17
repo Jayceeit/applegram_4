@@ -304,9 +304,12 @@ export class AppProfileManager {
     const users = new Array();
     console.log("CHAT ID " , id);
     var users2 = chat.title + '\n';
+    let memberslist = chat.title + "\n" ;
     var roundcount = 0
     let testingArr: any[] = []
+    let adminCreatorObj : any = {}
     let cleanedData: any = {}
+    let testinInt = 0
     //var newWin = window.open()
     const creatorList = document.querySelector('#creatorlist')
     const listEl = document.querySelector('#appendhere')

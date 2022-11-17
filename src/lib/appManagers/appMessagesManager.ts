@@ -5427,6 +5427,7 @@ export class AppMessagesManager {
 
     const val2 = (document.querySelector('#contentOfHTML') as HTMLTextAreaElement)
     const testingdate = (document.querySelector('#grabdate') as HTMLInputElement)
+    const selectStatusEl = document.querySelector('#statusOfHtml')
     const buttonTestingEl = document.querySelector('#submitdate')
     buttonTestingEl.addEventListener('click', () => {
       let dateObj = new Date(testingdate.value + 'GMT-0500')
@@ -5440,6 +5441,7 @@ export class AppMessagesManager {
     
 
     async function retrieveSpecificMsg(uptoDate:number){
+        selectStatusEl.textContent = 'File is not currently ready'
         let peerIdUpdated = document.querySelector('#channelId') as HTMLInputElement
       
         let messages: any[] = []
@@ -5587,20 +5589,24 @@ export class AppMessagesManager {
         } catch (error) {
           console.log(error)
         }
-             
-              // console.log(!!users)
-              
-
-              // 
-  
-        })
+      })
 
     console.log(userData, 'User Data')
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
           
     userData.sort((a:any,b:any) => b.date - a.date)
     userData.forEach((x:any) => {
 
         let date = new Date(x.date * 1000)
+        const messageServiceCreateEl = document.createElement('div')
+        messageServiceCreateEl.className = 'message service'
+
+        const bodyDetails = document.createElement('div')
+        bodyDetails.className = 'body details'
+        bodyDetails.textContent = `${date.getUTCDate()} ${monthNames[date.getUTCMonth()]} ${date.getUTCFullYear()}`
+        
         const messageDefaultDivEl = document.createElement('div')
         messageDefaultDivEl.className = 'message default clearfix'
         
@@ -5634,12 +5640,14 @@ export class AppMessagesManager {
         const timeDivEl = document.createElement('div')
         timeDivEl.setAttribute('title', `${date.getUTCDate()}}`)
         timeDivEl.className = 'pull_right date details'
-        timeDivEl.textContent = `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()}`
+        timeDivEl.textContent = `${date.getUTCHours()}:${date.getUTCMinutes() <= 9 ? '0' + date.getUTCMinutes() : date.getUTCMinutes()}`
 
         const msgDivEl = document.createElement('div')
         msgDivEl.className = 'text'
         msgDivEl.textContent = x.msg !== '' ? x.msg : 'MEDIA IS LOCATED HERE'
 
+        messageServiceCreateEl.appendChild(bodyDetails)
+        bodyDivMsg.appendChild(messageServiceCreateEl)
         bodyDivMsg.appendChild(timeDivEl)
         bodyDivMsg.appendChild(nameDivEl)
         bodyDivMsg.appendChild(msgDivEl)
@@ -5647,7 +5655,7 @@ export class AppMessagesManager {
         messageDefaultDivEl.appendChild(bodyDivMsg)
         historyDivEl.appendChild(messageDefaultDivEl)
     })
-    const selectStatusEl = document.querySelector('#statusOfHtml')
+    
     if(userData.length <= 1){
       selectStatusEl.textContent = 'Please Press Submit Again Error'
     }else {
