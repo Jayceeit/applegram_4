@@ -68,8 +68,6 @@ console.timeEnd('get storage1'); */
       memberEl.forEach(x => {
         listCopy.push(x.textContent)
       })
-
-      console.log(listCopy)
       
       let data = await navigator.clipboard.writeText(listCopy.join('\n')).then(() => {
         alert('copied')
@@ -84,11 +82,11 @@ console.timeEnd('get storage1'); */
     let downloadHTML = document.querySelector('#downloadthefile')
    
     downloadHTML.addEventListener('click', () => {
-      download(val1,val2.textContent)
+      download(val1, val2.textContent)
     })
 
     function download(filename:any, content:any) {
-      var element = document.createElement('a');
+      let element = document.createElement('a');
       element.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(content));
       element.setAttribute('download', filename);
     

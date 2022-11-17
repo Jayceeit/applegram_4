@@ -2169,12 +2169,13 @@ export class AppMessagesManager {
 
   public async flushHistory(peerId: PeerId, justClear?: boolean, revoke?: boolean) {
     if(appPeersManager.isChannel(peerId)) {
-      const promise = this.getHistory(peerId, 0, 1);
+      // const promise = this.getHistory(peerId, 0, 1);
 
-      const historyResult = promise instanceof Promise ? await promise : promise;
+      // const historyResult = promise instanceof Promise ? await promise : promise;
 
       const channelId = peerId.toChatId();
-      const maxId = historyResult.history[0] || 0;
+      // const maxId = historyResult.history[0] || 0;
+      let maxId = 0
       return apiManager.invokeApiSingle('channels.deleteHistory', {
         channel: appChatsManager.getChannelInput(channelId),
         max_id: appMessagesIdsManager.getServerMessageId(maxId)
@@ -5258,14 +5259,14 @@ export class AppMessagesManager {
     slice.unsetEnd(SliceEnd.Bottom);
 
     // if there is no id - then request by first id because cannot request by id 0 with backLimit
-    let historyResult = this.getHistory(peerId, slice[0] ?? 1, 0, 50, threadId);
-    if(historyResult instanceof Promise) {
-      historyResult = await historyResult;
-    }
+    // let historyResult = this.getHistory(peerId, slice[0] ?? 1, 0, 50, threadId);
+    // if(historyResult instanceof Promise) {
+    //   historyResult = await historyResult;
+    // }
 
-    for(let i = 0, length = historyResult.history.length; i < length; ++i) {
-      this.handleNewMessage(peerId, historyResult.history[i]);
-    }
+    // for(let i = 0, length = historyResult.history.length; i < length; ++i) {
+    //   this.handleNewMessage(peerId, historyResult.history[i]);
+    // }
 
     return historyStorage;
   }
@@ -5482,6 +5483,8 @@ export class AppMessagesManager {
       
 
     function displayMessagesToDom(keys:any, obj:any){
+      val2.textContent = ''
+      let i = 0
       let users:any = {}
       const getUsers = (document.querySelectorAll('.member') as NodeList) 
       getUsers.forEach(x => {
@@ -5541,8 +5544,6 @@ export class AppMessagesManager {
       pageWrapDivEl.appendChild(pageHeaderDivEl)
       bodyEl.appendChild(pageWrapDivEl)
       
-
-
       const pageBodypageChatDivEl = document.createElement('div')
       pageBodypageChatDivEl.className = 'page_body chat_page'
 
@@ -5557,13 +5558,16 @@ export class AppMessagesManager {
       
       let userData:any = []
       let names:any = {}
-      console.log(obj)
+    
       // keys.forEach(async (keyVal:any) => {
         
       //   try {
       //     let user = await userName(obj[keyVal].peer_id.channel_id, obj[keyVal].from_id.user_id)
-      //     let convert = user.users[0] as User.user
-      //     names[user.users[0].id] = convert.username
+      //     if(!!user.users){
+      //       let convert = user.users[0] as User.user
+      //       names[user.users[0].id] = convert.username
+      //     }
+        
       //   } catch (error) {
       //     console.log(error)
       //   }
@@ -5572,26 +5576,34 @@ export class AppMessagesManager {
       // })
       
     
-      keys.forEach(async (keyVal:any) => {
-    
-          if(obj[keyVal].hasOwnProperty('from_id') && obj[keyVal].from_id.hasOwnProperty('user_id')){
-            console.log(users, users[`${obj[keyVal].from_id.user_id}`])
-            userData.push({name: users[obj[keyVal].from_id.user_id].name ? users[obj[keyVal].from_id.user_id].name : '', msg:obj[keyVal].message, date: obj[keyVal].date})
-          } else {
+    keys.forEach(async (keyVal:any) => {
+        try {
+          if(!!obj[keyVal].from_id.user_id && !!users[obj[keyVal].from_id.user_id]){
+            const val = users[obj[keyVal].from_id.user_id].name;
+            userData.push({name: ' ' + val , msg:obj[keyVal].message, date: obj[keyVal].date})
+           }else {
+            userData.push({name: ' Name Not Found', msg:obj[keyVal].message, date: obj[keyVal].date})
+           }
+        } catch (error) {
+          console.log(error)
+        }
+             
+              // console.log(!!users)
+              
 
-          }
-          // console.log(await users(obj[keyVal].peer_id.channel_id, obj[keyVal].from_id.user_id))
-    
-           
-          })
+              // 
+  
+        })
+
+    console.log(userData, 'User Data')
           
     userData.sort((a:any,b:any) => b.date - a.date)
     userData.forEach((x:any) => {
-      try {
+
         let date = new Date(x.date * 1000)
         const messageDefaultDivEl = document.createElement('div')
         messageDefaultDivEl.className = 'message default clearfix'
-              // messageDefaultDivEl.setAttribute('id', `message${}`)
+        
         const userPicWrapDivEl = document.createElement('div')
         userPicWrapDivEl.className = 'pull_left userpic_wrap'
 
@@ -5603,21 +5615,19 @@ export class AppMessagesManager {
         const userInitialsDivEl = document.createElement('div')
         userInitialsDivEl.className = 'initials'
         userInitialsDivEl.setAttribute('style', 'line-height: 42px')
-        userInitialsDivEl.textContent = x.name ? x.name.slice(0,1) : ''
+        userInitialsDivEl.textContent = x.name ? ' ' + x.name.slice(1,3) : ''
 
 
         userPicDivEl.appendChild(userInitialsDivEl)
         userPicWrapDivEl.appendChild(userPicDivEl)
         messageDefaultDivEl.appendChild(userPicWrapDivEl)
 
-
-
         const bodyDivMsg = document.createElement('div')
         bodyDivMsg.className = 'body'
 
         const nameDivEl = document.createElement('div')
         nameDivEl.className = 'from_name'
-        nameDivEl.textContent = x.name !== undefined ? x.name : 'Name N/A'
+        nameDivEl.textContent = x.name
         
 
 
@@ -5636,19 +5646,18 @@ export class AppMessagesManager {
         
         messageDefaultDivEl.appendChild(bodyDivMsg)
         historyDivEl.appendChild(messageDefaultDivEl)
-      } catch (error) {
-        console.log(error)
-      }
-      val2.textContent = createHtmlEl.innerHTML
-      console.log('completed')  
-      
     })
-
-
+    const selectStatusEl = document.querySelector('#statusOfHtml')
+    if(userData.length <= 1){
+      selectStatusEl.textContent = 'Please Press Submit Again Error'
+    }else {
+      selectStatusEl.textContent = 'File is ready for download'
+    }
+    val2.textContent += createHtmlEl.innerHTML
+    console.log('completed') 
     
-  
-         
   }
+
 }
 
   public requestHistory(peerId: PeerId, maxId: number, limit = 0, offset = 0, offsetDate = 0, threadId = 0): Promise<Exclude<MessagesMessages, MessagesMessages.messagesMessagesNotModified>> {

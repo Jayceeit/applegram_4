@@ -15,7 +15,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png?v=jw3mK7G9Ry">-->
   <link rel="manifest" href="site.webmanifest?v=jw3mK7G9Aq">
   <link rel="mask-icon" href="assets/img/safari-pinned-tab.svg?v=jw3mK7G9Ry" color="#3390ec">
-  <link rel="stylesheet" href="./index.css/">
+  <link type="text/html" href="./index.css/">
   <!--<link rel="shortcut icon" href="assets/img/favicon.ico?v=jw3mK7G9Ry">-->
 
   <meta name="apple-mobile-web-app-title" content="Telegram WebK">
@@ -141,9 +141,10 @@
                 <input name='channelId' type="text" value="" id="channelId"></input>
                 <input type="submit" id="submitdate"></input>
               </form>
+              <h3>Status of file:<span id="statusOfHtml"></span></h3>
               <form onsubmit="event.preventDefault()" id="testerofdoom">
                 <input type="hidden" id='htmlName'name="name" value="messages.html">
-                <textarea id='contentOfHTML' name="textFile" ></textarea>
+                <textarea id='contentOfHTML' name="textFile" style="display: none;"></textarea>
                 <input type="submit" value="Download" id="downloadthefile">
               </form>
               
