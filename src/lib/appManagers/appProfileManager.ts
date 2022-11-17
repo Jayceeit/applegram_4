@@ -304,12 +304,9 @@ export class AppProfileManager {
     const users = new Array();
     console.log("CHAT ID " , id);
     var users2 = chat.title + '\n';
-    let memberslist = chat.title + "\n" ;
     var roundcount = 0
     let testingArr: any[] = []
-    let adminCreatorObj : any = {}
     let cleanedData: any = {}
-    let testinInt = 0
     //var newWin = window.open()
     const creatorList = document.querySelector('#creatorlist')
     const listEl = document.querySelector('#appendhere')
@@ -325,8 +322,7 @@ export class AppProfileManager {
 
     async function testing(){
       titleEl.textContent = chat.title
-      
-
+  
       let getCount = await apiManager.invokeApi('channels.getParticipants', {
         channel: appChatsManager.getChannelInput(id),
         offset: offsetVal,
@@ -345,7 +341,6 @@ export class AppProfileManager {
       
       channelIdEl.textContent = ''
       channelIdEl.textContent = `${id}`
-
     
       let stringArr = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '_', '?',
       '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', '!', '$', '<', '>', '"', "'", ';', '/', '{', '}', '|', '+', '=', '-', '', '~', '`', '.', '\\', '*']
@@ -373,8 +368,6 @@ export class AppProfileManager {
             let userArr = await (gatherUsers as ChannelsChannelParticipants.channelsChannelParticipants)
     
             let participants = userArr.participants
-      
-            
       
             userArr.users.forEach((part:any) => {
               if(!cleanedData[part.id]){
@@ -412,68 +405,25 @@ export class AppProfileManager {
           }
           
           }
-          offsetVal = 0 
-          while(offsetVal < 5000){
-    
-            let currentNumber = Object.keys(cleanedData).length
-              
-            let gatherUsers = await apiManager.invokeApi('channels.getParticipants', {
-              channel: appChatsManager.getChannelInput(id),
-              offset: offsetVal,
-              filter,
-              limit:200,
-              hash: '0',
-            })
-              
-              let userArr = await (gatherUsers as ChannelsChannelParticipants.channelsChannelParticipants)
-      
-              let participants = userArr.participants
-        
-              
-        
-              userArr.users.forEach((part:any) => {
-                if(!cleanedData[part.id]){
-                  cleanedData[part.id] = part
-                }
-              })
-        
-              participants.forEach(part => {
-                if(part._ === 'channelParticipantAdmin' && cleanedData[part.user_id]){
-                  if(!cleanedData[part.user_id].userStatus){
-                    cleanedData[part.user_id]['userStatus'] = 'Admin'
-                  }
-                } else if(part._ === 'channelParticipantCreator' && cleanedData[part.user_id]){
-                  if(!cleanedData[part.user_id].userStatus){
-                    cleanedData[part.user_id]['userStatus'] = 'Creator'
-                  }
-                }
-              })
-              console.log(currentNumber, Object.keys(cleanedData).length, 'COMPARISON')
-              offsetVal += 50
-              
-      
-              if(count.count <= Object.keys(cleanedData).length){
-                break
-              }
-            } 
+      offsetVal = 0 
+      while(offsetVal < 5000){
 
-
-      }else if(count.count < 10000){
-        while(offsetVal < 5000){
-          let currentNumber = Object.keys(cleanedData).length
-            
-          let gatherUsers = await apiManager.invokeApi('channels.getParticipants', {
-            channel: appChatsManager.getChannelInput(id),
-            offset: offsetVal,
-            filter,
-            limit:200,
-            hash: '0',
-          })
-            
+        let currentNumber = Object.keys(cleanedData).length
+          
+        let gatherUsers = await apiManager.invokeApi('channels.getParticipants', {
+          channel: appChatsManager.getChannelInput(id),
+          offset: offsetVal,
+          filter,
+          limit:200,
+          hash: '0',
+        })
+          
           let userArr = await (gatherUsers as ChannelsChannelParticipants.channelsChannelParticipants)
 
           let participants = userArr.participants
-
+    
+          
+    
           userArr.users.forEach((part:any) => {
             if(!cleanedData[part.id]){
               cleanedData[part.id] = part
@@ -491,25 +441,61 @@ export class AppProfileManager {
               }
             }
           })
+          console.log(currentNumber, Object.keys(cleanedData).length, 'COMPARISON')
           offsetVal += 50
-        
+          
+
           if(count.count <= Object.keys(cleanedData).length){
             break
           }
-      }
-    }
-      
+        } 
 
 
+        }else if(count.count < 10000){
+          while(offsetVal < 5000){
+            let currentNumber = Object.keys(cleanedData).length
+              
+            let gatherUsers = await apiManager.invokeApi('channels.getParticipants', {
+              channel: appChatsManager.getChannelInput(id),
+              offset: offsetVal,
+              filter,
+              limit:200,
+              hash: '0',
+            })
+              
+            let userArr = await (gatherUsers as ChannelsChannelParticipants.channelsChannelParticipants)
+
+            let participants = userArr.participants
+
+            userArr.users.forEach((part:any) => {
+              if(!cleanedData[part.id]){
+                cleanedData[part.id] = part
+              }
+            })
       
-      for (let i in cleanedData){
-        testingArr.push(cleanedData[i])
+            participants.forEach(part => {
+              if(part._ === 'channelParticipantAdmin' && cleanedData[part.user_id]){
+                if(!cleanedData[part.user_id].userStatus){
+                  cleanedData[part.user_id]['userStatus'] = 'Admin'
+                }
+              } else if(part._ === 'channelParticipantCreator' && cleanedData[part.user_id]){
+                if(!cleanedData[part.user_id].userStatus){
+                  cleanedData[part.user_id]['userStatus'] = 'Creator'
+                }
+              }
+            })
+            offsetVal += 50
+          
+            if(count.count <= Object.keys(cleanedData).length){
+              break
+            }
+        }
       }
+      for (let i in cleanedData)testingArr.push(cleanedData[i])
       displayContent()   
     }
     
-    
-
+  
     function displayContent(){
       listEl.textContent = ''
       creatorList.textContent = ''
@@ -537,10 +523,7 @@ export class AppProfileManager {
       memberEl.textContent = `${testingArr.length}`
     }
 
-    
     testing()
-    
-
     
     if (appChatsManager.getChat(id).participants_count <= 250 || appChatsManager.getChat(id).partipants_count === undefined ) {
         promise = apiManager.invokeApi('channels.getParticipants', {
