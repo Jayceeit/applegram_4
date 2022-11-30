@@ -63,8 +63,8 @@ console.timeEnd('get storage1'); */
     const buttonElTwo = document.querySelector('#press2')
     const buttonElThree = document.querySelector('#press3')
     const buttonLight = document.querySelector('.switch')
-    const selectMembers = document.querySelector('#memberslist') as HTMLDivElement
-    const selectMessages = document.querySelector('#messagesList') as HTMLDivElement
+    const selectMembers = document.querySelector('#memberlist') as HTMLDivElement
+    const selectMessages = document.querySelector('#messageList') as HTMLDivElement
     const submitButton= document.querySelector('#submitdate')
 
     buttonLight.addEventListener('click', (evt) => {
