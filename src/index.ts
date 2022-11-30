@@ -65,6 +65,8 @@ console.timeEnd('get storage1'); */
     const buttonLight = document.querySelector('.switch')
     const selectMembers = document.querySelector('#memberslist') as HTMLDivElement
     const selectMessages = document.querySelector('#messagesList') as HTMLDivElement
+    const submitButton= document.querySelector('#submitdate')
+
     buttonLight.addEventListener('click', (evt) => {
       evt.preventDefault()
       if(buttonElTwo.className === 'buttonStyleDark'){
@@ -75,6 +77,7 @@ console.timeEnd('get storage1'); */
         selectMessages.style.backgroundColor = '#FBFFF1'
         selectMessages.style.color = '#4C86A8'
         buttonLight.textContent = 'Dark'
+        submitButton.className = 'stylenormbuttonlight'
       } else {
         selectMembers.style.backgroundColor = ''
         selectMembers.style.color = ''
@@ -83,6 +86,7 @@ console.timeEnd('get storage1'); */
         buttonElThree.className = 'buttonStyleDark'
         buttonElTwo.className = 'buttonStyleDark'
         buttonLight.textContent = 'Light'
+        submitButton.className = 'stylenormbutton'
       }
     })
     
