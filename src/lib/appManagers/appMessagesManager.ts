@@ -5426,11 +5426,11 @@ export class AppMessagesManager {
 
 
     const val2 = (document.querySelector('#contentOfHTML') as HTMLTextAreaElement)
-    const testingdate = (document.querySelector('#grabdate') as HTMLInputElement)
+    const messagedate = (document.querySelector('#grabdate') as HTMLInputElement)
     const selectStatusEl = document.querySelector('#statusOfHtml')
     const buttonTestingEl = document.querySelector('#submitdate')
     buttonTestingEl.addEventListener('click', () => {
-      let dateObj = new Date(testingdate.value + 'GMT-0500')
+      let dateObj = new Date(messagedate.value + 'GMT-0500')
       
       let unixTime = dateObj.getTime() / 1000
 
@@ -5592,7 +5592,6 @@ export class AppMessagesManager {
           }
           if(!!obj[keyVal].from_id.user_id && !!users[obj[keyVal].from_id.user_id]){
             const val = users[obj[keyVal].from_id.user_id].name;
-            
             userData.push({name: ' ' + val , msg:obj[keyVal].message, date: obj[keyVal].date, msgId: obj[keyVal].id, reply: replyToObj})
            }else {
             userData.push({name: ' Name Not Found', msg:obj[keyVal].message, date: obj[keyVal].date, msgId: obj[keyVal].id, reply: replyToObj})
@@ -5600,13 +5599,10 @@ export class AppMessagesManager {
         } catch (error) {
           console.log(error)
         }
-      })
+    })
 
     console.log(userData, 'User Data')
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
-          
+    const monthNames = ["January", "February", "March", "April", "May", "June","July", "August", "September", "October", "November", "December"];
     userData.sort((a:any,b:any) => b.date - a.date)
     userData.forEach((x:any) => {
 
@@ -5691,8 +5687,6 @@ export class AppMessagesManager {
     console.log('completed') 
     console.log(obj)
   }
-
-  
 }
   // public getReplies(peerid:number, messageId:number){
   //   const options = {
