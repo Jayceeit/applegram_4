@@ -58,15 +58,48 @@ console.timeEnd('get storage1'); */
     }
 
     
-
+    const val1 = (document.querySelector('#htmlName') as HTMLInputElement).value
+    const val2 = (document.querySelector('#contentOfHTML') as HTMLTextAreaElement)
+    let downloadHTML = document.querySelector('#downloadthefile')
     const buttonEl = document.querySelector('#press')
     const buttonElTwo = document.querySelector('#press2')
     const buttonElThree = document.querySelector('#press3')
     const buttonLight = document.querySelector('.switch')
     const selectMembers = document.querySelector('#memberlist') as HTMLDivElement
     const selectMessages = document.querySelector('#messageList') as HTMLDivElement
-    const submitButton= document.querySelector('#submitdate')
+    const submitButton = document.querySelector('#submitdate')
+    let obtainUserInfo:any = document.querySelector('body')
+    const userModalEl = document.querySelector('#user-modal')
+    const userNameEl = document.querySelector('.user-name')
+    const userIdEl = document.querySelector('.user-id')
+    const copyUserName = document.querySelector('.copy-username') as HTMLButtonElement
+    const copyIdName = document.querySelector('.copy-userid') as HTMLButtonElement
+    const closeModalEl = document.querySelector('.close-modal') as HTMLButtonElement
 
+    dragElement(userModalEl)
+
+    closeModalEl.addEventListener('click', (evt:any) => {
+      userModalEl.className = 'hide-modal'
+    })
+
+    copyUserName.addEventListener('click' ,(evt:any) => {
+      copyToClipBoard(copyUserName)
+    }) 
+
+    copyIdName.addEventListener('click' ,(evt:any) => {
+      copyToClipBoard(copyIdName)
+    }) 
+      
+    obtainUserInfo.addEventListener('click', (evt:any) => {
+      if(evt.target.className === 'peer-title'){
+        userModalEl.className = 'show-modal'
+        let userInfo = evt.target.textContent.split('')
+        let id = userInfo.splice(-15)
+        userNameEl.textContent = `@${userInfo.join('')}`
+        userIdEl.textContent = `${id.splice(-10).join('')}`
+      }
+    })
+    
     buttonLight.addEventListener('click', (evt) => {
       evt.preventDefault()
       if(buttonElTwo.className === 'buttonStyleDark'){
@@ -90,13 +123,11 @@ console.timeEnd('get storage1'); */
       }
     })
     
-
     buttonElThree.addEventListener('click', async (evt)=>{
       let channelId = document.querySelector('.idofchan')  
       let data = await navigator.clipboard.writeText(channelId.textContent).then(() => {
         alert('copied')
       })
-    
     })
 
     buttonElTwo.addEventListener('click', async (evt)=>{
@@ -105,19 +136,11 @@ console.timeEnd('get storage1'); */
       memberEl.forEach(x => {
         listCopy.push(x.textContent)
       })
-      
       let data = await navigator.clipboard.writeText(listCopy.join('\n')).then(() => {
         alert('copied')
       })
-    
     })
 
-    const val1 = (document.querySelector('#htmlName') as HTMLInputElement).value
-    const val2 = (document.querySelector('#contentOfHTML') as HTMLTextAreaElement)
-    
-
-    let downloadHTML = document.querySelector('#downloadthefile')
-   
     downloadHTML.addEventListener('click', () => {
       download(val1, val2.textContent)
     })
@@ -126,16 +149,59 @@ console.timeEnd('get storage1'); */
       let element = document.createElement('a');
       element.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(content));
       element.setAttribute('download', filename);
-    
       element.style.display = 'none';
       document.body.appendChild(element);
-    
       element.click();
-    
       document.body.removeChild(element);
     }
 
+    function copyToClipBoard(buttonIdentifer:any){
+      let elementToCopy = buttonIdentifer.className === 'copy-username' ? userNameEl : userIdEl
+      let data = navigator.clipboard.writeText(elementToCopy.textContent).then(() => {
+        alert('copied')
+      })
+    }
 
+    function dragElement(elmnt:any) {
+      var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      if (document.getElementById(elmnt.id + "header")) {
+        // if present, the header is where you move the DIV from:
+        document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+      } else {
+        // otherwise, move the DIV from anywhere inside the DIV:
+        elmnt.onmousedown = dragMouseDown;
+      }
+    
+      function dragMouseDown(e:any) {
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // call a function whenever the cursor moves:
+        document.onmousemove = elementDrag;
+      }
+    
+      function elementDrag(e:any) {
+        e = e || window.event;
+        e.preventDefault();
+        // calculate the new cursor position:
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // set the element's new position:
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+      }
+    
+      function closeDragElement() {
+        // stop moving when mouse button is released:
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
     // We listen to the resize event (https://css-tricks.com/the-trick-to-viewport-units-on-mobile/)
     // @ts-ignore
     const w = window.visualViewport || window; // * handle iOS keyboard

@@ -5419,12 +5419,8 @@ export class AppMessagesManager {
       } */
     });
   }
-
   
-  public getMessages(peerId: PeerId, maxId: number, limit = 0, offset = 0, offsetDate = 0, threadId = 0){
-
-
-
+  private getMessages(peerId: PeerId, maxId: number, limit = 0, offset = 0, offsetDate = 0, threadId = 0){
     const val2 = (document.querySelector('#contentOfHTML') as HTMLTextAreaElement)
     const messagedate = (document.querySelector('#grabdate') as HTMLInputElement)
     const selectStatusEl = document.querySelector('#statusOfHtml')
@@ -5439,7 +5435,6 @@ export class AppMessagesManager {
       return
     })
     
-
     async function retrieveSpecificMsg(uptoDate:number){
         selectStatusEl.textContent = 'File is not currently ready'
         let peerIdUpdated = document.querySelector('#channelId') as HTMLInputElement
@@ -5468,7 +5463,6 @@ export class AppMessagesManager {
         displayMessagesToDom(keysOfMessages, filteredMessages)
       }
 
-  
     async function userName(channelId:number, participantId:number){
       let options = {
         channel:await appChatsManager.getChannelInput(channelId),
@@ -5483,7 +5477,6 @@ export class AppMessagesManager {
       }
     }
       
-
     function displayMessagesToDom(keys:any, obj:any){
       val2.textContent = ''
       let i = 0
@@ -5560,23 +5553,6 @@ export class AppMessagesManager {
       
       let userData:any = []
       let names:any = {}
-    
-      // keys.forEach(async (keyVal:any) => {
-        
-      //   try {
-      //     let user = await userName(obj[keyVal].peer_id.channel_id, obj[keyVal].from_id.user_id)
-      //     if(!!user.users){
-      //       let convert = user.users[0] as User.user
-      //       names[user.users[0].id] = convert.username
-      //     }
-        
-      //   } catch (error) {
-      //     console.log(error)
-      //   }
-
-        
-      // })
-      
     
     keys.forEach(async (keyVal:any) => {
         try {
@@ -5677,7 +5653,6 @@ export class AppMessagesManager {
         messageDefaultDivEl.appendChild(bodyDivMsg)
         historyDivEl.appendChild(messageDefaultDivEl)
     })
-    
     if(userData.length <= 1){
       selectStatusEl.textContent = 'Please Press Submit Again Error'
     }else {
@@ -5685,7 +5660,6 @@ export class AppMessagesManager {
     }
     val2.textContent += createHtmlEl.innerHTML
     console.log('completed') 
-    console.log(obj)
   }
 }
   // public getReplies(peerid:number, messageId:number){

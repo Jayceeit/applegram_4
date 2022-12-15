@@ -1564,3 +1564,26 @@ textarea {
 #grabdate, #channelId{
   color: black;
 }
+
+#user-modal{
+  overflow: auto;
+  box-sizing: content-box;
+  position: absolute;
+  flex-direction: column;
+  margin-top: 0vmin;
+  margin-left: 0vmin;
+  width: 30%;
+  height: 10%;
+  padding: 10px;
+  background-color: gray;
+  color: black;
+  z-index: 10;
+}
+
+.show-modal{
+  display: flex;
+}
+
+.hide-modal{
+  display: none;
+}
