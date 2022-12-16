@@ -94,9 +94,26 @@ console.timeEnd('get storage1'); */
       if(evt.target.className === 'peer-title'){
         userModalEl.className = 'show-modal'
         let userInfo = evt.target.textContent.split('')
-        let id = userInfo.splice(-15)
-        userNameEl.textContent = `@${userInfo.join('')}`
-        userIdEl.textContent = `${id.splice(-10).join('')}`
+        let idArr:string[] = []
+        let nameArr:string[] = []
+        let i = 0 
+        let signal = false
+        while(userInfo[i] !== 'I'){
+          nameArr.push(userInfo[i])
+          i++
+        }
+        i = 0
+        while(i <= userInfo.length - 1){
+          if(userInfo[i] === ':'){
+            signal = true
+          }
+          if(signal === true){
+            idArr.push(userInfo[i])
+          }
+          i++
+        }
+        userNameEl.textContent = `@${nameArr.join('')}`
+        userIdEl.textContent = `${idArr.join('')}`
       }
     })
     
