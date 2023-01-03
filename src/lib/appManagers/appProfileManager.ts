@@ -1,3 +1,4 @@
+
 /*
  * https://github.com/morethanwords/tweb
  * Copyright (C) 2019-2021 Eduard Kuzmenko
@@ -160,6 +161,8 @@ export class AppProfileManager {
       return this.fullPromises[peerId] as any;
     }
 
+    this.getUserName(id)
+    
     return this.fullPromises[peerId] = apiManager.invokeApi('users.getFullUser', {
       id: appUsersManager.getUserInput(id)
     }).then((userFull) => {
@@ -189,6 +192,17 @@ export class AppProfileManager {
 
       return this.usersFull[id] = userFull;
     }) as any;
+  }
+
+  public async getUserName(id:any){
+    const userNameEl = document.querySelector('.user-name')
+    const userIdEl = document.querySelector('.user-id')
+    const userModalEl = document.querySelector('#user-modal')
+    const userInformation = await apiManager.invokeApi('users.getFullUser', { id: appUsersManager.getUserInput(id) }) as UserFull
+    let userData = userInformation.user as User
+    userNameEl.textContent = !!userData.username ? `@${userData.username}` : 'Username is not available'
+    userIdEl.textContent = `${userData.id}`
+    userModalEl.className = 'show-modal'
   }
 
   public getProfileByPeerId(peerId: PeerId, override?: true): Promise<ChatFull.chatFull | ChatFull.channelFull | UserFull.userFull> {
