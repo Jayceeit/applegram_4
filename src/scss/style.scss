@@ -1446,11 +1446,9 @@ middle-ellipsis-element {
   margin-left: .125rem;
 }
 
-
 textarea {
     display: none;
 }
-
 
 #memberlist {
   display: flex;
@@ -1459,7 +1457,9 @@ textarea {
   font-family: 'Oswald', sans-serif;
 }
 
-
+#appendhere{
+  width: 45vmin;
+}
 
 .container {
   display: flex;
@@ -1481,6 +1481,7 @@ textarea {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  box-sizing: content-box;
 }
 
 .buttonStyleDark{

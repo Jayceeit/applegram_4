@@ -197,11 +197,14 @@ export class AppProfileManager {
   public async getUserName(id:any){
     const userNameEl = document.querySelector('.user-name')
     const userIdEl = document.querySelector('.user-id')
+    const userDisplayNameEl = document.querySelector('.user-displayname')
     const userModalEl = document.querySelector('#user-modal')
     const userInformation = await apiManager.invokeApi('users.getFullUser', { id: appUsersManager.getUserInput(id) }) as UserFull
     let userData = userInformation.user as User
+    console.log(userData,' Turtle')
     userNameEl.textContent = !!userData.username ? `@${userData.username}` : 'Username is not available'
     userIdEl.textContent = `${userData.id}`
+    userDisplayNameEl.textContent = ` ${!!userData.first_name ? userData.first_name : ''} ${!!userData.last_name ? userData.last_name : ''}`
     userModalEl.className = 'show-modal'
   }
 
@@ -424,9 +427,7 @@ export class AppProfileManager {
           }
       offsetVal = 0 
       while(offsetVal < 5000){
-
         let currentNumber = Object.keys(cleanedData).length
-          
         let gatherUsers = await apiManager.invokeApi('channels.getParticipants', {
           channel: appChatsManager.getChannelInput(id),
           offset: offsetVal,
@@ -434,13 +435,8 @@ export class AppProfileManager {
           limit:200,
           hash: '0',
         })
-          
           let userArr = await (gatherUsers as ChannelsChannelParticipants.channelsChannelParticipants)
-
           let participants = userArr.participants
-    
-          
-    
           userArr.users.forEach((part:any) => {
             if(!cleanedData[part.id]){
               cleanedData[part.id] = part
@@ -453,18 +449,11 @@ export class AppProfileManager {
                 cleanedData[part.user_id]['userStatus'] = 'Admin'
               }
             } else if(part._ === 'channelParticipantCreator' && cleanedData[part.user_id]){
-              if(!cleanedData[part.user_id].userStatus){
-                cleanedData[part.user_id]['userStatus'] = 'Creator'
-              }
+              if(!cleanedData[part.user_id].userStatus)cleanedData[part.user_id]['userStatus'] = 'Creator'
             }
           })
-          console.log(currentNumber, Object.keys(cleanedData).length, 'COMPARISON')
           offsetVal += 50
-          
-
-          if(count.count <= Object.keys(cleanedData).length){
-            break
-          }
+          if(count.count <= Object.keys(cleanedData).length)break
         } 
 
 
@@ -509,10 +498,10 @@ export class AppProfileManager {
         }
       }
       for (let i in cleanedData)testingArr.push(cleanedData[i])
+      console.log(cleanedData,testingArr)
       displayContent()   
     }
     
-  
     function displayContent(){
       listEl.textContent = ''
       creatorList.textContent = ''
@@ -533,9 +522,7 @@ export class AppProfileManager {
         }else {
           listEl.appendChild(newListItem)
         }
-
         listEl.appendChild(document.createElement('br'))
-        
       })
       memberEl.textContent = `${testingArr.length}`
     }

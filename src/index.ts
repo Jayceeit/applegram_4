@@ -71,9 +71,12 @@ console.timeEnd('get storage1'); */
     let obtainUserInfo:any = document.querySelector('body')
     const userModalEl = document.querySelector('#user-modal')
     const userNameEl = document.querySelector('.user-name')
+    const userDisplayNameEl = document.querySelector('.user-displayname')
     const userIdEl = document.querySelector('.user-id')
     const copyUserName = document.querySelector('.copy-username') as HTMLButtonElement
     const copyIdName = document.querySelector('.copy-userid') as HTMLButtonElement
+    const copyDisplayName = document.querySelector('.copy-userdisplayname') as HTMLButtonElement
+    const copyDisplayId = document.querySelector('.copy-user-display-id') as HTMLButtonElement
     const closeModalEl = document.querySelector('.close-modal') as HTMLButtonElement
 
     dragElement(userModalEl)
@@ -86,9 +89,18 @@ console.timeEnd('get storage1'); */
       copyToClipBoard(copyUserName)
     }) 
 
+    copyDisplayName.addEventListener('click' ,(evt:any) => {
+      copyToClipBoard(copyDisplayName)
+    }) 
+
     copyIdName.addEventListener('click' ,(evt:any) => {
       copyToClipBoard(copyIdName)
     }) 
+    copyDisplayId.addEventListener('click', async (evt) => {
+      await navigator.clipboard.writeText(`${userDisplayNameEl.textContent} ID: ${userIdEl.textContent}`).then(() => {
+        alert('copied')
+      })
+    })
     
     buttonLight.addEventListener('click', (evt) => {
       evt.preventDefault()
@@ -146,8 +158,13 @@ console.timeEnd('get storage1'); */
     }
 
     function copyToClipBoard(buttonIdentifer:any){
-      let elementToCopy = buttonIdentifer.className === 'copy-username' ? userNameEl : userIdEl
-      let data = navigator.clipboard.writeText(elementToCopy.textContent).then(() => {
+      let elementToCopy = {
+        'copy-username' :userNameEl, 
+        'copy-userid': userIdEl,
+        'copy-userdisplayname': userDisplayNameEl
+      }
+      let trial = elementToCopy[buttonIdentifer.className as keyof typeof elementToCopy] as HTMLElement
+      let data = navigator.clipboard.writeText(trial.textContent).then(() => {
         alert('copied')
       })
     }
