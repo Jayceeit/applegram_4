@@ -209,6 +209,10 @@ console.timeEnd('get storage1'); */
         document.onmousemove = null;
       }
     }
+
+    window.addEventListener('beforeunload', () => {
+      sessionStorage.clear()
+    })
     // We listen to the resize event (https://css-tricks.com/the-trick-to-viewport-units-on-mobile/)
     // @ts-ignore
     const w = window.visualViewport || window; // * handle iOS keyboard

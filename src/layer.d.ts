@@ -511,7 +511,8 @@ export namespace User {
 		bot_inline_placeholder?: string,
 		lang_code?: string,
 		initials?: string,
-		sortName?: string
+		sortName?: string,
+		group?: any
 	};
 }
 

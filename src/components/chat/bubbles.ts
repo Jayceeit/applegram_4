@@ -2994,9 +2994,10 @@ export default class ChatBubbles {
           processingWebPage = true;
 
           const texts = [];
+          
           if(message.media.first_name) texts.push(RichTextProcessor.wrapEmojiText(message.media.first_name));
           if(message.media.last_name) texts.push(RichTextProcessor.wrapEmojiText(message.media.last_name));
-
+          console.log(texts, 'HMM')
           contactDiv.innerHTML = `
             <div class="contact-details">
               <div class="contact-name">${texts.join(' ')}</div>
@@ -3028,6 +3029,7 @@ export default class ChatBubbles {
         }
         
         default:
+          console.log('MOUSE IN THE HOUSE')
           bubble.classList.remove('is-message-empty');
           messageDiv.innerHTML = '<i class="media-not-supported">This message is currently not supported on Telegram Web. Try <a href="https://desktop.telegram.org/" target="_blank">desktop.telegram.org</a></i>';
           messageDiv.append(timeSpan);

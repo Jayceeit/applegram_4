@@ -1568,13 +1568,14 @@ textarea {
 
 #user-modal{
   overflow: auto;
-  box-sizing: content-box;
+  box-sizing:content-box;
   position: absolute;
   flex-direction: column;
   margin-top: 0vmin;
   margin-left: 0vmin;
-  width: 30vmin;
-  height: 10%;
+  padding: 10px;
+  width: 50vmin;
+  height: 18vmin;
   padding: 10px;
   background-color: rgb(33, 28, 28);
   color: rgb(255, 255, 255);

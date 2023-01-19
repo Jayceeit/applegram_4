@@ -1,3 +1,4 @@
+import { JSONObjectValue } from './../../layer.d';
 
 /*
  * https://github.com/morethanwords/tweb
@@ -162,13 +163,14 @@ export class AppProfileManager {
     }
 
     this.getUserName(id)
+    // this.usersFull = {}
     
     return this.fullPromises[peerId] = apiManager.invokeApi('users.getFullUser', {
       id: appUsersManager.getUserInput(id)
     }).then((userFull) => {
       const user = userFull.user as User;
       appUsersManager.saveApiUser(user, true);
-
+      console.log(appUsersManager.users, Object.keys(appUsersManager.users), 'POO')
       if(userFull.profile_photo) {
         userFull.profile_photo = appPhotosManager.savePhoto(userFull.profile_photo, {type: 'profilePhoto', peerId});
       }
@@ -339,10 +341,9 @@ export class AppProfileManager {
     document.getElementById('appendhere').innerHTML = 'Loading...'
 
     let offsetVal = 0
-
+    
     async function testing(){
       titleEl.textContent = chat.title
-  
       let getCount = await apiManager.invokeApi('channels.getParticipants', {
         channel: appChatsManager.getChannelInput(id),
         offset: offsetVal,
@@ -350,26 +351,20 @@ export class AppProfileManager {
         limit:200,
         hash: '0',
       })
-
       let count = await (getCount as ChannelsChannelParticipants.channelsChannelParticipants)
-
       if(count.count >= 5000){
         notice.textContent = 'More than 5000 users this will take awhile...'
       } else {
         notice.textContent = ''
       }
-      
       channelIdEl.textContent = ''
       channelIdEl.textContent = `${id}`
-    
       let stringArr = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '_', '?',
       '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', '!', '$', '<', '>', '"', "'", ';', '/', '{', '}', '|', '+', '=', '-', '', '~', '`', '.', '\\', '*']
       let i = 0
       if(count.count >= 10000){
         while(i < stringArr.length - 1){
-
           let currentNumber = Object.keys(cleanedData).length
-            
           let gatherUsers = await apiManager.invokeApi('channels.getParticipants', {
             channel: appChatsManager.getChannelInput(id),
             offset: offsetVal,
@@ -380,22 +375,18 @@ export class AppProfileManager {
             limit:200,
             hash: '0',
           })
-            
           if(offsetVal >= 5000){
             offsetVal = 0
             i++
           }else{
             let userArr = await (gatherUsers as ChannelsChannelParticipants.channelsChannelParticipants)
-    
             let participants = userArr.participants
-      
             userArr.users.forEach((part:any) => {
               if(!cleanedData[part.id]){
                 cleanedData[part.id] = part
                 
               } 
             })
-      
             participants.forEach(part => {
               if(part._ === 'channelParticipantAdmin' && cleanedData[part.user_id]){
                 if(!cleanedData[part.user_id].userStatus){
@@ -415,15 +406,10 @@ export class AppProfileManager {
               console.log(Object.keys(cleanedData).length)
               offsetVal += 50
             }
-    
             if(count.count <= Object.keys(cleanedData).length){
               break
             }
-            // if(condition.length >= userArr.count || condition.length >= 9900){
-            //   break
-            // }
           }
-          
           }
       offsetVal = 0 
       while(offsetVal < 5000){
@@ -442,7 +428,6 @@ export class AppProfileManager {
               cleanedData[part.id] = part
             }
           })
-    
           participants.forEach(part => {
             if(part._ === 'channelParticipantAdmin' && cleanedData[part.user_id]){
               if(!cleanedData[part.user_id].userStatus){
@@ -455,8 +440,6 @@ export class AppProfileManager {
           offsetVal += 50
           if(count.count <= Object.keys(cleanedData).length)break
         } 
-
-
         }else if(count.count < 10000){
           while(offsetVal < 5000){
             let currentNumber = Object.keys(cleanedData).length
@@ -468,38 +451,41 @@ export class AppProfileManager {
               limit:200,
               hash: '0',
             })
-              
             let userArr = await (gatherUsers as ChannelsChannelParticipants.channelsChannelParticipants)
-
             let participants = userArr.participants
-
             userArr.users.forEach((part:any) => {
-              if(!cleanedData[part.id]){
-                cleanedData[part.id] = part
-              }
+              if(!cleanedData[part.id])cleanedData[part.id] = part
             })
-      
             participants.forEach(part => {
               if(part._ === 'channelParticipantAdmin' && cleanedData[part.user_id]){
-                if(!cleanedData[part.user_id].userStatus){
-                  cleanedData[part.user_id]['userStatus'] = 'Admin'
-                }
+                if(!cleanedData[part.user_id].userStatus)cleanedData[part.user_id]['userStatus'] = 'Admin'
               } else if(part._ === 'channelParticipantCreator' && cleanedData[part.user_id]){
-                if(!cleanedData[part.user_id].userStatus){
-                  cleanedData[part.user_id]['userStatus'] = 'Creator'
-                }
+                if(!cleanedData[part.user_id].userStatus)cleanedData[part.user_id]['userStatus'] = 'Creator'
               }
             })
             offsetVal += 50
-          
-            if(count.count <= Object.keys(cleanedData).length){
-              break
-            }
+            if(count.count <= Object.keys(cleanedData).length)break
         }
       }
+      let keysOfAdditionalUsers = Object.keys(appUsersManager.users)
+      console.log(sessionStorage, 'ON REFRESH')
+      keysOfAdditionalUsers.forEach(x => {
+        if(!(x in sessionStorage)){
+          sessionStorage[x] = JSON.stringify(id)
+        } 
+      })
+
+      keysOfAdditionalUsers.forEach(x => {
+        if(!!cleanedData[x]){
+          console.log('exists')
+        } else if (JSON.parse(sessionStorage[x]) === id){
+          cleanedData[x] = appUsersManager.users[x]
+        }
+      })
       for (let i in cleanedData)testingArr.push(cleanedData[i])
-      console.log(cleanedData,testingArr)
+      console.log(sessionStorage)
       displayContent()   
+      // appUsersManager.users = {}
     }
     
     function displayContent(){
@@ -559,7 +545,7 @@ export class AppProfileManager {
         */
       
         //console.log("MEMBERS COUNT: ", offset)
-        //console.log("MEMBERS LIST", memberslist)
+        //console.log("MEMBERS LIST", memberslist
         
 
         

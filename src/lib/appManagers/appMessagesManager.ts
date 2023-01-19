@@ -4779,7 +4779,7 @@ export class AppMessagesManager {
         pFlags: {verified: true},
         access_hash: '0',
         first_name: 'Telegram',
-        phone: '42777'
+        phone: '42777',
       }]);
     }
     this.saveMessages([message], {isOutgoing: true});
@@ -5276,7 +5276,19 @@ export class AppMessagesManager {
    */
   public getHistory(peerId: PeerId, maxId = 0, limit: number, backLimit?: number, threadId?: number): Promise<HistoryResult> | HistoryResult {
     this.getMessages(peerId, maxId, 0,0,threadId)
-    console.log(peerId, 'HERE HERE ')
+    let copy = appProfileManager.chatsFull
+    setTimeout(() => {
+      let testval = copy[peerId.toChatId()] as ChatFull.channelFull
+      let usersKeys = Object.keys(appUsersManager.users)
+      usersKeys.forEach(x => {
+        if(!(x in sessionStorage)){
+          sessionStorage[x] = testval.linked_chat_id
+        }
+      }) 
+      console.log(sessionStorage)
+    },5000)
+    
+    console.log(appUsersManager.users, 'UH OH', sessionStorage, peerId, copy)
     const historyStorage = this.getHistoryStorage(peerId, threadId);
     let offset = 0
     
@@ -5555,6 +5567,8 @@ export class AppMessagesManager {
       let names:any = {}
     
     keys.forEach(async (keyVal:any) => {
+        // console.log(userName(obj[keyVal].peer_id.channel_id, obj[keyVal].from_id.user_id))
+        console.log(obj[keyVal])
         try {
           let replyToObj = {
             replyStatus: false,

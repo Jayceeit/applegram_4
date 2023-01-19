@@ -38,7 +38,7 @@ export type MyTopPeer = {id: PeerId, rating: number};
 export class AppUsersManager {
   private storage = appStateManager.storages.users;
   
-  private users: {[userId: UserId]: User};
+  public users: {[userId: UserId]: User};
   private usernames: {[username: string]: UserId};
   private contactsIndex: SearchIndex<UserId>;
   private contactsFillPromise: CancellablePromise<AppUsersManager['contactsList']>;
