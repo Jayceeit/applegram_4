@@ -1,3 +1,4 @@
+import { scrollClass } from './../additional_functionality/autoScroll';
 /*
  * https://github.com/morethanwords/tweb
  * Copyright (C) 2019-2021 Eduard Kuzmenko
@@ -169,6 +170,14 @@ export class AppSidebarLeft extends SidebarSlider {
         setTimeout(() => {
           a.remove();
         }, 0);
+      }
+    },{
+      icon: 'plus',
+      text: 'Obtain_Members',
+      onClick: () => {
+        let scrollEl = document.querySelectorAll('.scrollable')[3].setAttribute('id', 'secure')
+        let rerun = document.querySelector('#secure')
+        scrollClass.scrollChannel(rerun)
       }
     }, {
       icon: 'char z',

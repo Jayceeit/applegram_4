@@ -1566,7 +1566,7 @@ textarea {
   color: black;
 }
 
-#user-modal{
+#user-modal ,#channel-modal{
   overflow: auto;
   box-sizing:content-box;
   position: absolute;
@@ -1574,13 +1574,23 @@ textarea {
   margin-top: 0vmin;
   margin-left: 0vmin;
   padding: 10px;
-  width: 50vmin;
-  height: 18vmin;
+  width: 100px;
+  height: 14vmin;
   padding: 10px;
   background-color: rgb(33, 28, 28);
   color: rgb(255, 255, 255);
   z-index: 10;
+  border-radius: 25px;
 }
+
+// #channel-modal {
+//   position: absolute;
+//   background-color: red;
+//   z-index: 5;
+//   height: 200px;
+//   width: 200px;
+//   margin-top: 50px;
+// }
 
 .show-modal{
   display: flex;
@@ -1588,4 +1598,11 @@ textarea {
 
 .hide-modal{
   display: none;
+}
+
+@media only screen and (max-width: 1600px) {
+  #user-modal, #channel-modal{
+    width: 300px;
+    height: 19vmin;
+  }
 }

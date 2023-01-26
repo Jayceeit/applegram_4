@@ -123,6 +123,7 @@ const lang = {
   "Saved": "Saved",
   "Deleted": "Deleted",
   "ReportBug": "Report Bug",
+  "Obtain_Members" : "Obtain  Members",
   "Notifications.Count": {
     "one_value": "%d notification",
     "other_value": "%d notifications"

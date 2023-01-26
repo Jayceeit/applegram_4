@@ -80,6 +80,7 @@
 "Profile" = "Profile";
 "Saved" = "Saved";
 "ReportBug" = "Report Bug";
+"ObtainMembers" = "Obtain Members";
 "Notifications.Count_one" = "%d notification";
 "Notifications.Count_other" = "%d notifications";
 "Notifications.Forwarded_one" = "Forwarded %d message";

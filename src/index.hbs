@@ -37,7 +37,7 @@
   <!--[if IE]>
     <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
   <![endif]-->
-  <div id="user-modal" class="show-modal">
+  <div id="user-modal" class="hide-modal">
     <div id="user-modalheader">Click and Hold here to move around</div>
     <div>Username: <span class="user-name"></span></div>
     <div>User Display Name:<span class="user-displayname"></span></div>
@@ -50,6 +50,18 @@
       <button class="close-modal">Close</button>
     </div>
   </div>
+  <div id="channel-modal" class="hide-modal">
+    <div id="channel-modalheader">Click and Hold here to move around</div>
+    <div>Channel Name:<span class="channel-name"></span></div>
+    <div>ID: <span class="channel-id"></span></div>
+    <div id="modal-buttons">
+      <button class="copy-channel-name">Copy Name</button>
+      <button class="copy-channel-id">Copy ID</button>
+      <button class="copy-channel-name-id">Copy Name and ID</button>
+      <button class="close-channel-modal">Close</button>
+    </div>
+  </div>
+  
   <div class="whole" id="auth-pages" style="display: none;">
     <div class="scrollable scrollable-y">
       <div class="tabs-container auth-pages__container" data-animation="tabs">
@@ -132,6 +144,7 @@
                   <h3 id="membercount">Number of Members: <span class="numberofmems"></span></h3>
                   <button id="press2" class="buttonStyleDark">Copy All Members</button>
                   <button id="press3" class="buttonStyleDark">Copy Channel ID</button>
+                  <button id="press4" class="buttonStyleDark">Copy Scraped Users</button>
                 </div>
                 <div class="container">
                   <h1 class="modal-title" id="exampleModalLabel">MEMBERS LIST</h1>
@@ -143,11 +156,15 @@
                   <div>
                     <h2>Members</h2>
                   </div>
-                  
-                  
                   <ul class="modal-body" id="appendhere">
                     No group selected. Please choose a group to view it's members list.
                     <!-- This is the modal that appends the data for users-->
+                  </ul>
+                  <div>
+                    <h2>Members from Scrape</h2>
+                  </div>
+                  <ul class="modal-body" id="member-scrape">
+                    Run Scraper
                   </ul>
                 </div>
                   
