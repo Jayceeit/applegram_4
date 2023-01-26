@@ -151,7 +151,7 @@ export default class ChatTopbar {
       this.btnPinned, 
       this.btnMute, 
       this.btnSearch, 
-      this.btnMore
+      this.btnMore,
     ].filter(Boolean));
 
     this.container.append(this.btnBack, this.chatInfo, this.chatUtils);

@@ -153,11 +153,10 @@ export class AppImManager {
     this.chatsContainer = document.createElement('div');
     this.chatsContainer.classList.add('chats-container', 'tabs-container');
     this.chatsContainer.dataset.animation = 'navigation';
-
     this.columnEl.append(this.chatsContainer);
-    
     this.createNewChat();
     this.chatsSelectTab(this.chat.container);
+    
 
     appNavigationController.onHashChange = this.onHashChange;
     //window.addEventListener('hashchange', this.onHashChange);

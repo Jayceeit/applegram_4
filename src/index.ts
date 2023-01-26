@@ -1,3 +1,5 @@
+import { copy_channel_class } from './components/additional_functionality/copy_id';
+import { scrollClass } from './components/additional_functionality/autoScroll';
 /*
  * https://github.com/morethanwords/tweb
  * Copyright (C) 2019-2021 Eduard Kuzmenko
@@ -64,6 +66,7 @@ console.timeEnd('get storage1'); */
     const buttonEl = document.querySelector('#press')
     const buttonElTwo = document.querySelector('#press2')
     const buttonElThree = document.querySelector('#press3')
+    const buttonElFour = document.querySelector('#press4')
     const buttonLight = document.querySelector('.switch')
     const selectMembers = document.querySelector('#memberlist') as HTMLDivElement
     const selectMessages = document.querySelector('#messageList') as HTMLDivElement
@@ -78,8 +81,34 @@ console.timeEnd('get storage1'); */
     const copyDisplayName = document.querySelector('.copy-userdisplayname') as HTMLButtonElement
     const copyDisplayId = document.querySelector('.copy-user-display-id') as HTMLButtonElement
     const closeModalEl = document.querySelector('.close-modal') as HTMLButtonElement
+    const channelModalEl = document.querySelector('#channel-modal') 
+    const channelCopyNameButtonEl = document.querySelector('.copy-channel-name') as HTMLButtonElement
+    const channelCopyIdButtonEl = document.querySelector('.copy-channel-id') as HTMLButtonElement
+    const channelCloseModalEl = document.querySelector('.close-channel-modal') as HTMLButtonElement
+    const channelCopyNameIdButtonEl = document.querySelector('.copy-channel-name-id') as HTMLButtonElement
+    const channelName = document.querySelector('.channel-name') as HTMLButtonElement
+    const channelId = document.querySelector('.channel-id') as HTMLButtonElement
 
     dragElement(userModalEl)
+    dragElement(channelModalEl)
+
+    channelCloseModalEl.addEventListener('click', (evt:any) => {
+      channelModalEl.className = 'hide-modal'
+    })
+
+    channelCopyNameButtonEl.addEventListener('click', (evt:any) => {
+      copyToClipBoard(channelCopyNameButtonEl)
+    })
+
+    channelCopyIdButtonEl.addEventListener('click', (evt:any) => {
+      copyToClipBoard(channelCopyIdButtonEl)
+    })
+
+    channelCopyNameIdButtonEl.addEventListener('click', async (evt) => {
+      await navigator.clipboard.writeText(`${channelName.textContent} ID: ${channelId.textContent}`).then(() => {
+        alert('copied')
+      })
+    })
 
     closeModalEl.addEventListener('click', (evt:any) => {
       userModalEl.className = 'hide-modal'
@@ -107,6 +136,7 @@ console.timeEnd('get storage1'); */
       if(buttonElTwo.className === 'buttonStyleDark'){
         buttonElThree.className = 'buttonStyleLight'
         buttonElTwo.className = 'buttonStyleLight'
+        buttonElFour.className = 'buttonStyleLight'
         selectMembers.style.backgroundColor = '#FBFFF1'
         selectMembers.style.color = '#4C86A8'
         selectMessages.style.backgroundColor = '#FBFFF1'
@@ -120,9 +150,21 @@ console.timeEnd('get storage1'); */
         selectMessages.style.color = ''
         buttonElThree.className = 'buttonStyleDark'
         buttonElTwo.className = 'buttonStyleDark'
+        buttonElFour.className = 'buttonStyleLight'
         buttonLight.textContent = 'Light'
         submitButton.className = 'stylenormbutton'
       }
+    })
+
+    buttonElFour.addEventListener('click', async (evt)=>{
+      let memberEl = document.querySelectorAll('.scraped-user')
+      let listCopy: string[] = []
+      memberEl.forEach(x => {
+        listCopy.push(x.textContent)
+      })
+      let data = await navigator.clipboard.writeText(listCopy.join('\n')).then(() => {
+        alert('copied')
+      })
     })
     
     buttonElThree.addEventListener('click', async (evt)=>{
@@ -161,13 +203,26 @@ console.timeEnd('get storage1'); */
       let elementToCopy = {
         'copy-username' :userNameEl, 
         'copy-userid': userIdEl,
-        'copy-userdisplayname': userDisplayNameEl
+        'copy-userdisplayname': userDisplayNameEl,
+        'copy-channel-name': channelName,
+        'copy-channel-id': channelId
       }
       let trial = elementToCopy[buttonIdentifer.className as keyof typeof elementToCopy] as HTMLElement
       let data = navigator.clipboard.writeText(trial.textContent).then(() => {
         alert('copied')
       })
     }
+
+    window.addEventListener('click', (evt) => {
+      const divEl = evt.target as HTMLElement
+      if (divEl.className === 'peer-title'){
+        channelModalEl.className = 'show-modal'
+        let channel_info = divEl.textContent.replace('-', '').replace('ID:', '').split(' ')
+        channelId.textContent = channel_info[channel_info.length - 1]
+        channel_info.join(' ').replace(`${channel_info[channel_info.length - 1]}`, '')
+        channelName.textContent = channel_info.join(' ').replace(`${channel_info[channel_info.length - 1]}`, '')
+      }
+    })
 
     function dragElement(elmnt:any) {
       var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -534,5 +589,7 @@ console.timeEnd('get storage1'); */
     (Array.from(document.getElementsByClassName('rp')) as HTMLElement[]).forEach(el => ripple(el));
   });
 //});
+
+
 
 

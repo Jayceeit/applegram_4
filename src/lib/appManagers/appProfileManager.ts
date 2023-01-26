@@ -170,7 +170,6 @@ export class AppProfileManager {
     }).then((userFull) => {
       const user = userFull.user as User;
       appUsersManager.saveApiUser(user, true);
-      console.log(appUsersManager.users, Object.keys(appUsersManager.users), 'POO')
       if(userFull.profile_photo) {
         userFull.profile_photo = appPhotosManager.savePhoto(userFull.profile_photo, {type: 'profilePhoto', peerId});
       }
