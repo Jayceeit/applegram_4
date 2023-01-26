@@ -67,6 +67,7 @@ console.timeEnd('get storage1'); */
     const buttonElTwo = document.querySelector('#press2')
     const buttonElThree = document.querySelector('#press3')
     const buttonElFour = document.querySelector('#press4')
+    const buttonElFive = document.querySelector('#press5')
     const buttonLight = document.querySelector('.switch')
     const selectMembers = document.querySelector('#memberlist') as HTMLDivElement
     const selectMessages = document.querySelector('#messageList') as HTMLDivElement
@@ -91,6 +92,12 @@ console.timeEnd('get storage1'); */
 
     dragElement(userModalEl)
     dragElement(channelModalEl)
+
+    buttonElFive.addEventListener('click', () => {
+        let scrollEl = document.querySelectorAll('.scrollable')[3].setAttribute('id', 'secure')
+        let rerun = document.querySelector('#secure')
+        scrollClass.scrollChannel(rerun)
+    })
 
     channelCloseModalEl.addEventListener('click', (evt:any) => {
       channelModalEl.className = 'hide-modal'
@@ -137,6 +144,7 @@ console.timeEnd('get storage1'); */
         buttonElThree.className = 'buttonStyleLight'
         buttonElTwo.className = 'buttonStyleLight'
         buttonElFour.className = 'buttonStyleLight'
+        buttonElFive.className = 'buttonStyleLight'
         selectMembers.style.backgroundColor = '#FBFFF1'
         selectMembers.style.color = '#4C86A8'
         selectMessages.style.backgroundColor = '#FBFFF1'
@@ -150,7 +158,8 @@ console.timeEnd('get storage1'); */
         selectMessages.style.color = ''
         buttonElThree.className = 'buttonStyleDark'
         buttonElTwo.className = 'buttonStyleDark'
-        buttonElFour.className = 'buttonStyleLight'
+        buttonElFour.className = 'buttonStyleDark'
+        buttonElFive.className = 'buttonStyleDark'
         buttonLight.textContent = 'Light'
         submitButton.className = 'stylenormbutton'
       }
