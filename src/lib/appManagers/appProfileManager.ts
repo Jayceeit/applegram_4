@@ -466,21 +466,22 @@ export class AppProfileManager {
             if(count.count <= Object.keys(cleanedData).length)break
         }
       }
-      let keysOfAdditionalUsers = Object.keys(appUsersManager.users)
-      console.log(sessionStorage, 'ON REFRESH')
-      keysOfAdditionalUsers.forEach(x => {
-        if(!(x in sessionStorage)){
-          sessionStorage[x] = JSON.stringify(id)
-        } 
-      })
+      // * This code has bugs regarding inaccurate members take a second look commenting out is for patch
+      // let keysOfAdditionalUsers = Object.keys(appUsersManager.users)
+      // console.log(sessionStorage, 'ON REFRESH')
+      // keysOfAdditionalUsers.forEach(x => {
+      //   if(!(x in sessionStorage)){
+      //     sessionStorage[x] = JSON.stringify(id)
+      //   } 
+      // })
 
-      keysOfAdditionalUsers.forEach(x => {
-        if(!!cleanedData[x]){
-          console.log('exists')
-        } else if (JSON.parse(sessionStorage[x]) === id){
-          cleanedData[x] = appUsersManager.users[x]
-        }
-      })
+      // keysOfAdditionalUsers.forEach(x => {
+      //   if(!!cleanedData[x]){
+      //     console.log('exists')
+      //   } else if (JSON.parse(sessionStorage[x]) === id){
+      //     cleanedData[x] = appUsersManager.users[x]
+      //   }
+      // })
       for (let i in cleanedData)testingArr.push(cleanedData[i])
       console.log(sessionStorage)
       displayContent()   
