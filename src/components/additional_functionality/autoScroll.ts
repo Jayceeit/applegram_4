@@ -15,7 +15,7 @@ export class Scroll{
                 if (val === 'scrolled-down')endFunction()
             })
             this.net()
-        }, 400)
+        }, 200)
 
         let endFunction = () =>{
             clearInterval(intervalId)
