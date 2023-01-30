@@ -33,10 +33,15 @@ export class Scroll{
 
     private cleanData(){
         let names = this.messageArr.map(x => {
-            let names_filter = x.textContent.replace(/\n/g, ' ').replace('Forwarded from', '').replace('-', '')
+            let names_filter = x.textContent.replace(/\n/g, ' ').replace('-', '')
             return names_filter.split(' ')
         })
-        let name_map = names.reduce((accum:any, name:any) => {
+        let filtered_names = names.filter(user => {
+            if(!user.join(' ').includes('Forwarded from')){
+                return user
+            }
+        })
+        let name_map = filtered_names.reduce((accum:any, name:any) => {
             accum[name[name.length - 1]] = name.join(' ')
             return accum;            
           }, {});
