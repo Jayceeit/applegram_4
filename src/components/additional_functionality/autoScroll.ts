@@ -33,7 +33,7 @@ export class Scroll{
 
     private cleanData(){
         let names = this.messageArr.map(x => {
-            let names_filter = x.textContent.replace(/\n/g, ' ').replace('-', '')
+            let names_filter = x.textContent.replace(/\n/g, ' ').replace('-', '').replace('.', '').replace(':','').replace('ID','')
             return names_filter.split(' ')
         })
         let filtered_names = names.filter(user => {
@@ -53,14 +53,21 @@ export class Scroll{
         scrapeListEl.innerHTML = ''
         const keys_of_array = Object.keys(obj)
         keys_of_array.forEach(id => {
+            let split_data:any[] = obj[id].split(' ')
+            const split_data_length = split_data.length - 1
+            let user_id 
+            if (!!appUsersManager.users[split_data[split_data.length - 1]]){
+                if('username' in appUsersManager.users[split_data[split_data_length]]){
+                    user_id = `@${appUsersManager.users[split_data[split_data_length]].username}`
+                } else {
+                    user_id = ''
+                }
+            }
             const create_list_el = document.createElement('li')
             create_list_el.className = 'scraped-user'
-            create_list_el.textContent = obj[id]
+            create_list_el.textContent = `${split_data.join(' ').replace(/([0-9])/g,'')} ${user_id} ( ${split_data[split_data.length - 1]} )`
             scrapeListEl.appendChild(create_list_el)
         })
-
-        
     }
 }
-
 export const scrollClass = new Scroll([])

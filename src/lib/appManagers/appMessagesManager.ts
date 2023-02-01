@@ -5270,7 +5270,7 @@ export class AppMessagesManager {
 
     return historyStorage;
   }
-// * Comment here 
+
   /**
    * * https://core.telegram.org/api/offsets, offset_id is inclusive
    */
@@ -5285,7 +5285,6 @@ export class AppMessagesManager {
           sessionStorage[x] = testval.linked_chat_id
         }
       }) 
-      console.log(sessionStorage)
     },5000)
     
     console.log(appUsersManager.users, 'UH OH', sessionStorage, peerId, copy)
