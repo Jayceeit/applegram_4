@@ -137,11 +137,13 @@
         <div class="tabs-tab main-column" id="column-center">
               <div id="memberlist" style="z-index:-1; width:100%; height: 0px !important; overflow: scroll; text-align: center; border: 1px solid black;" class="overlay">
                 <div class="container">
-                  <button class="switch">Light</button>
                   <h1>Details of group</h1>
                   <h3 class="modal-title" id="TITLE">Channel Name: <span class="titleofchan"></span></h3>
                   <h3 class="channelId">Channel ID: <span class="idofchan"></span></h3>
                   <h3 id="membercount">Number of Members: <span class="numberofmems"></span></h3>
+                  <h3>Scrape Status: <span id="scrape-status"></span></h3>
+                  <h3>Scrape Count: <span id="scrape-count"></span></h3>
+                  <button class="switch">Light</button>
                   <button id="press2" class="buttonStyleDark">Copy All Members</button>
                   <button id="press3" class="buttonStyleDark">Copy Channel ID</button>
                   <button id="press5" class="buttonStyleDark">Run Scrape Users</button>
@@ -242,13 +244,13 @@
       </div>
     </div>
   </div>
-  <button type="button" class="btn btn-primary" onclick='document.getElementById("memberlist").style.zIndex= "50"; document.getElementById("memberlist").style.height= "1000px";console.log("pressing the button");'>
+  <button type="button" class="btn btn-primary" onclick='document.getElementById("memberlist").style.zIndex= "3"; document.getElementById("memberlist").style.height= "1000px";console.log("pressing the button");'>
     Show Members List
   </button>
   <button type="button" class="btn btn-primary" onclick='document.getElementById("memberlist").style.zIndex= "-1"; document.getElementById("memberlist").style.height= "0px"; console.log("pressing the button");'>
     Hide Members List
   </button>
-  <button type="button" class="btn btn-primary" onclick='document.getElementById("messageList").style.zIndex= "50"; document.getElementById("messageList").style.height= "400px";console.log("pressing the button");'>
+  <button type="button" class="btn btn-primary" onclick='document.getElementById("messageList").style.zIndex= "3"; document.getElementById("messageList").style.height= "400px";console.log("pressing the button");'>
     Show Message Retrieval
   </button>
   <button type="button" class="btn btn-primary" onclick='document.getElementById("messageList").style.zIndex= "-1"; document.getElementById("messageList").style.height= "0px"; console.log("pressing the button");'>

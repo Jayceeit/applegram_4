@@ -2,12 +2,20 @@ import appUsersManager from "../../lib/appManagers/appUsersManager"
 
 export class Scroll{
     messageArr:any[]
+    count:number
+    scrape_status:HTMLElement
+    scrape_count:HTMLElement
 
     constructor(messageArr:[]){
         this.messageArr = messageArr
+        this.count = 0
+        this.scrape_status = document.querySelector('#scrape-status')
+        this.scrape_count = document.querySelector('#scrape-count')
+        
     }
 
     public scrollChannel(container:any){
+        this.scrape_status.textContent = 'Running'
         let intervalId = setInterval(() => {
             const stoppingPoint = document.querySelectorAll('.bubbles')[0]
             container.scrollTop = container.scrollHeight
@@ -22,7 +30,7 @@ export class Scroll{
             this.appendToHtml(this.cleanData())
         }
     }
-    
+    // * grabs all the display names as the window is scrolling down 
     private net(){
         this.messageArr = []
         let arrayOfMessages = document.querySelectorAll('.bubble-content-wrapper > .bubble-content > .name')
@@ -30,7 +38,7 @@ export class Scroll{
             this.messageArr.push(msg)
         })
     }
-
+    // * cleans the information by removing unecessary characters and checking whether a user was forwarded from another group
     private cleanData(){
         let names = this.messageArr.map(x => {
             let names_filter = x.textContent.replace(/\n/g, ' ').replace('-', '').replace('.', '').replace(':','').replace('ID','')
@@ -47,8 +55,9 @@ export class Scroll{
           }, {});
         return name_map
     }
-
+    // * Updates html with new information
     private appendToHtml(obj:any){
+        this.count = 0
         const scrapeListEl = document.querySelector('#member-scrape') as HTMLElement
         scrapeListEl.innerHTML = ''
         const keys_of_array = Object.keys(obj)
@@ -65,9 +74,12 @@ export class Scroll{
             }
             const create_list_el = document.createElement('li')
             create_list_el.className = 'scraped-user'
-            create_list_el.textContent = `${split_data.join(' ').replace(/([0-9])/g,'')} ${user_id} ( ${split_data[split_data.length - 1]} )`
+            create_list_el.textContent = `${split_data.join(' ').replace(/([0-9])/g,'')} ${user_id !== undefined ? user_id : ''} ( ${split_data[split_data.length - 1]} )`
             scrapeListEl.appendChild(create_list_el)
+            this.count += 1
+            this.scrape_status.textContent = 'Done'
         })
+        this.scrape_count.textContent = `${this.count}`
     }
 }
 export const scrollClass = new Scroll([])
