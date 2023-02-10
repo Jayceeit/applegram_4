@@ -11,22 +11,22 @@ export class Scroll{
         this.count = 0
         this.scrape_status = document.querySelector('#scrape-status')
         this.scrape_count = document.querySelector('#scrape-count')
-        
     }
 
     public scrollChannel(container:any){
         this.scrape_status.textContent = 'Running'
-        let intervalId = setInterval(() => {
+        let intervalId = setInterval(async () => {
             const stoppingPoint = document.querySelectorAll('.bubbles')[0]
             container.scrollTop = container.scrollHeight
             stoppingPoint.classList.forEach((val:any) => {
                 if (val === 'scrolled-down')endFunction()
             })
-            this.net()
+            await this.net()
         }, 200)
 
         let endFunction = () =>{
             clearInterval(intervalId)
+            this.net()
             this.appendToHtml(this.cleanData())
         }
     }
@@ -64,17 +64,17 @@ export class Scroll{
         keys_of_array.forEach(id => {
             let split_data:any[] = obj[id].split(' ')
             const split_data_length = split_data.length - 1
-            let user_id 
+            let username 
             if (!!appUsersManager.users[split_data[split_data.length - 1]]){
                 if('username' in appUsersManager.users[split_data[split_data_length]]){
-                    user_id = `@${appUsersManager.users[split_data[split_data_length]].username}`
+                    username = `@${appUsersManager.users[split_data[split_data_length]].username}`
                 } else {
-                    user_id = ''
+                    username = ''
                 }
             }
             const create_list_el = document.createElement('li')
             create_list_el.className = 'scraped-user'
-            create_list_el.textContent = `${split_data.join(' ').replace(/([0-9])/g,'')} ${user_id !== undefined ? user_id : ''} ( ${split_data[split_data.length - 1]} )`
+            create_list_el.textContent = `${split_data.join(' ').replace(/([0-9])/g,'')} ${username !== undefined ? username : ''} ( ${split_data[split_data.length - 1]} )`
             scrapeListEl.appendChild(create_list_el)
             this.count += 1
             this.scrape_status.textContent = 'Done'
