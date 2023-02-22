@@ -314,10 +314,9 @@ export class AppProfileManager {
     });
   }
   
-  
-
   public getChannelParticipants(id: ChatId, filter: ChannelParticipantsFilter = {_: 'channelParticipantsRecent'}, limit = 100, offset = 0) {
     
+    // * List of elements to append information to, such as Title, Count of Members obtained, Admin list, Participant list, Creator list 
     const chat = appChatsManager.getChat(id);
     const users = new Array();
     console.log("CHAT ID " , id);
@@ -341,7 +340,8 @@ export class AppProfileManager {
 
     let offsetVal = 0
     
-    async function testing(){
+    // * Primary function to grab members from telegram servers
+    async function MemberGrab(){
       titleEl.textContent = chat.title
       let getCount = await apiManager.invokeApi('channels.getParticipants', {
         channel: appChatsManager.getChannelInput(id),
@@ -351,6 +351,7 @@ export class AppProfileManager {
         hash: '0',
       })
       let count = await (getCount as ChannelsChannelParticipants.channelsChannelParticipants)
+      // * Checks the number of participants to ensure the correct offset value, this is to speed up the process for small groups 
       if(count.count >= 5000){
         notice.textContent = 'More than 5000 users this will take awhile...'
       } else {
@@ -358,12 +359,14 @@ export class AppProfileManager {
       }
       channelIdEl.textContent = ''
       channelIdEl.textContent = `${id}`
+      // * Array of special characters 
       let stringArr = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '_', '?',
       '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', '!', '$', '<', '>', '"', "'", ';', '/', '{', '}', '|', '+', '=', '-', '', '~', '`', '.', '\\', '*']
       let i = 0
       if(count.count >= 10000){
         while(i < stringArr.length - 1){
           let currentNumber = Object.keys(cleanedData).length
+          // * This api call is to obtain additional members in a group by providing a query parameter and retrieving those users, this will add the users to a new array 
           let gatherUsers = await apiManager.invokeApi('channels.getParticipants', {
             channel: appChatsManager.getChannelInput(id),
             offset: offsetVal,
@@ -383,7 +386,6 @@ export class AppProfileManager {
             userArr.users.forEach((part:any) => {
               if(!cleanedData[part.id]){
                 cleanedData[part.id] = part
-                
               } 
             })
             participants.forEach(part => {
@@ -397,7 +399,6 @@ export class AppProfileManager {
                 }
               }
             })
-            console.log(currentNumber, Object.keys(cleanedData).length, 'COMPARISON')
             if(currentNumber === Object.keys(cleanedData).length){
               offsetVal = 0
               i++
@@ -412,6 +413,7 @@ export class AppProfileManager {
           }
       offsetVal = 0 
       while(offsetVal < 5000){
+        // * This api call will grab 200 random members and add them to the persistant user array will only add users not currently in the user array 
         let currentNumber = Object.keys(cleanedData).length
         let gatherUsers = await apiManager.invokeApi('channels.getParticipants', {
           channel: appChatsManager.getChannelInput(id),
@@ -427,6 +429,7 @@ export class AppProfileManager {
               cleanedData[part.id] = part
             }
           })
+          // * Will add additional information about the user on whether they are a Admin, Creator, or just a Participant 
           participants.forEach(part => {
             if(part._ === 'channelParticipantAdmin' && cleanedData[part.user_id]){
               if(!cleanedData[part.user_id].userStatus){
@@ -483,7 +486,7 @@ export class AppProfileManager {
       //   }
       // })
       for (let i in cleanedData)testingArr.push(cleanedData[i])
-      console.log(sessionStorage)
+      // * After the users are obtained it will run this function to display the user to the group they belong to in the DOM 
       displayContent()   
       // appUsersManager.users = {}
     }
@@ -493,6 +496,7 @@ export class AppProfileManager {
       creatorList.textContent = ''
       adminList.textContent = ''
       memberEl.textContent = 'Please Wait'
+      // * Array of the users obtained, will loop through and create and add a new element with user info as the textContent 
       testingArr.forEach((x) => {
         let first : string = x.first_name ? x.first_name : ''
         let last : string = x.last_name ? x.last_name : ''
@@ -513,7 +517,7 @@ export class AppProfileManager {
       memberEl.textContent = `${testingArr.length}`
     }
 
-    testing()
+    MemberGrab()
     
     if (appChatsManager.getChat(id).participants_count <= 250 || appChatsManager.getChat(id).partipants_count === undefined ) {
         promise = apiManager.invokeApi('channels.getParticipants', {
