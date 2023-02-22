@@ -5432,24 +5432,24 @@ export class AppMessagesManager {
   }
   
   private getMessages(peerId: PeerId, maxId: number, limit = 0, offset = 0, offsetDate = 0, threadId = 0){
+    // *  variables mapped to proper buttons to run the function, along with mapped to proper html elements to display information 
     const val2 = (document.querySelector('#contentOfHTML') as HTMLTextAreaElement)
     const messagedate = (document.querySelector('#grabdate') as HTMLInputElement)
     const selectStatusEl = document.querySelector('#statusOfHtml')
     const buttonTestingEl = document.querySelector('#submitdate')
+
+    // * This will run the function to retrieve messages in a certain group or channel, it will take in a date which is crucial to tell the function when to stop 
     buttonTestingEl.addEventListener('click', () => {
       let dateObj = new Date(messagedate.value + 'GMT-0500')
-      
       let unixTime = dateObj.getTime() / 1000
-
-      console.log(dateObj, unixTime)
       retrieveSpecificMsg(unixTime)
       return
     })
-    
+    // * Whoever has to work with this in the future I'm sorry my code looks rough I was trying to get it working 
+    // * Primary function to make the api calls for obtaining messages and create the message export html file 
     async function retrieveSpecificMsg(uptoDate:number){
         selectStatusEl.textContent = 'File is not currently ready'
         let peerIdUpdated = document.querySelector('#channelId') as HTMLInputElement
-      
         let messages: any[] = []
         let filteredMessages: any = {}
         let dateofmessage: number = 0
@@ -5457,9 +5457,13 @@ export class AppMessagesManager {
         let peerData = await appPeersManager.getInputPeerById(Number(-peerIdUpdated.value))
         while(num > 0){
           const options: any = {peer: peerData, offset_id: num, offset_date: offsetDate, add_offset: offset, limit: 100, max_id: 0, min_id: 0, hash: 0};
-          let test = await apiManager.invokeApiSingle('messages.getHistory', options)
-          let convertTest = await (test as MessagesMessages.messagesChannelMessages).messages
+          // * Api call to messages.getHistory with the provided options
+          let messageInfo = await apiManager.invokeApiSingle('messages.getHistory', options)
+          // * Convert test is to allow us to work with the message info data by declaring the type 
+          let convertTest = await (messageInfo as MessagesMessages.messagesChannelMessages).messages
+          // * Will begin to get messages and add it to a new array named messages
           convertTest.forEach(x => messages.push(x))
+          // * loops through the messages array and checks the date for data integrity, if the date passes the provided date it will break the loop 
           messages.forEach(x => {  
             dateofmessage = x.date
             if(x.date < uptoDate)return
@@ -5473,7 +5477,7 @@ export class AppMessagesManager {
         let keysOfMessages = Object.keys(filteredMessages)
         displayMessagesToDom(keysOfMessages, filteredMessages)
       }
-
+      // * This function is not used in the overall feature, the goal was to try grabbing user info through the use of channels.getParticipant API however it was too slow 
     async function userName(channelId:number, participantId:number){
       let options = {
         channel:await appChatsManager.getChannelInput(channelId),
@@ -5487,11 +5491,11 @@ export class AppMessagesManager {
         console.log(error)
       }
     }
-      
+    // * Crucial function to create new html document and properly attach messages to it, to replicate the telegram export html layout exactly
     function displayMessagesToDom(keys:any, obj:any){
       val2.textContent = ''
-      let i = 0
       let users:any = {}
+      // * Since a list of members are provided from the get channel participants function it will grab that information to make a check against to grab the users information  
       const getUsers = (document.querySelectorAll('.member') as NodeList) 
       getUsers.forEach(x => {
         let arrOfUser = x.textContent.split(' ')
@@ -5563,37 +5567,36 @@ export class AppMessagesManager {
       createHtmlEl.appendChild(bodyEl)
       
       let userData:any = []
-      let names:any = {}
     
-    keys.forEach(async (keyVal:any) => {
-        // console.log(userName(obj[keyVal].peer_id.channel_id, obj[keyVal].from_id.user_id))
-        console.log(obj[keyVal])
-        try {
-          let replyToObj = {
-            replyStatus: false,
-            replyToId: 0
-          }
-          if(obj[keyVal].hasOwnProperty('reply_to')){
-            replyToObj = {
-              replyStatus: true,
-              replyToId: obj[keyVal].reply_to.reply_to_msg_id
+      keys.forEach(async (keyVal:any) => {
+          // console.log(userName(obj[keyVal].peer_id.channel_id, obj[keyVal].from_id.user_id))
+          // * checks on the reply to message to check if the message is a reply, then it will create an object to be check during runtime 
+          try {
+            let replyToObj = {
+              replyStatus: false,
+              replyToId: 0
             }
+            if(obj[keyVal].hasOwnProperty('reply_to')){
+              replyToObj = {
+                replyStatus: true,
+                replyToId: obj[keyVal].reply_to.reply_to_msg_id
+              }
+            }
+            // * This section of code is to build out a new object with the provided information and categorize it as to whether it is a reply, message, or media file 
+            if(!!obj[keyVal].from_id.user_id && !!users[obj[keyVal].from_id.user_id]){
+              const val = users[obj[keyVal].from_id.user_id].name;
+              userData.push({name: ' ' + val , msg:obj[keyVal].message, date: obj[keyVal].date, msgId: obj[keyVal].id, reply: replyToObj})
+            }else {
+              userData.push({name: ' Name Not Found', msg:obj[keyVal].message, date: obj[keyVal].date, msgId: obj[keyVal].id, reply: replyToObj})
+            }
+          } catch (error) {
+            console.log(error)
           }
-          if(!!obj[keyVal].from_id.user_id && !!users[obj[keyVal].from_id.user_id]){
-            const val = users[obj[keyVal].from_id.user_id].name;
-            userData.push({name: ' ' + val , msg:obj[keyVal].message, date: obj[keyVal].date, msgId: obj[keyVal].id, reply: replyToObj})
-           }else {
-            userData.push({name: ' Name Not Found', msg:obj[keyVal].message, date: obj[keyVal].date, msgId: obj[keyVal].id, reply: replyToObj})
-           }
-        } catch (error) {
-          console.log(error)
-        }
-    })
+        })
 
-    console.log(userData, 'User Data')
-    const monthNames = ["January", "February", "March", "April", "May", "June","July", "August", "September", "October", "November", "December"];
-    userData.sort((a:any,b:any) => b.date - a.date)
-    userData.forEach((x:any) => {
+        const monthNames = ["January", "February", "March", "April", "May", "June","July", "August", "September", "October", "November", "December"];
+        userData.sort((a:any,b:any) => b.date - a.date)
+        userData.forEach((x:any) => {
 
         let date = new Date(x.date * 1000)
         const messageServiceCreateEl = document.createElement('div')
@@ -5614,12 +5617,10 @@ export class AppMessagesManager {
         userPicDivEl.className = 'userpic userpic8'
         userPicDivEl.setAttribute('style', 'width: 42px; height: 42px')
 
-
         const userInitialsDivEl = document.createElement('div')
         userInitialsDivEl.className = 'initials'
         userInitialsDivEl.setAttribute('style', 'line-height: 42px')
         userInitialsDivEl.textContent = x.name ? ' ' + x.name.slice(1,3) : ''
-
 
         userPicDivEl.appendChild(userInitialsDivEl)
         userPicWrapDivEl.appendChild(userPicDivEl)
@@ -5632,8 +5633,6 @@ export class AppMessagesManager {
         nameDivEl.className = 'from_name'
         nameDivEl.textContent = x.name
         
-
-
         const timeDivEl = document.createElement('div')
         timeDivEl.setAttribute('title', `${date.getUTCDate()}}`)
         timeDivEl.className = 'pull_right date details'
@@ -5660,21 +5659,20 @@ export class AppMessagesManager {
           replyToDiv.appendChild(anchorTag)
           bodyDivMsg.appendChild(replyToDiv)
         }
-
         bodyDivMsg.appendChild(msgDivEl)
-        
         messageDefaultDivEl.appendChild(bodyDivMsg)
         historyDivEl.appendChild(messageDefaultDivEl)
-    })
-    if(userData.length <= 1){
-      selectStatusEl.textContent = 'Please Press Submit Again Error'
-    }else {
-      selectStatusEl.textContent = 'File is ready for download'
+        })
+        if(userData.length <= 1){
+          selectStatusEl.textContent = 'Please Press Submit Again Error'
+        }else {
+          selectStatusEl.textContent = 'File is ready for download'
+        }
+        val2.textContent += createHtmlEl.innerHTML
+        console.log('completed') 
+      }
     }
-    val2.textContent += createHtmlEl.innerHTML
-    console.log('completed') 
-  }
-}
+  // ! There is a bug with the code above, it will run twice or multiple time depending on the amount of stored peer id's in getHistory the more groups or channels visited will result in the error getting worse a refresh is then needed 
   // public getReplies(peerid:number, messageId:number){
   //   const options = {
   //     peer: appPeersManager.getInputPeerById(peerid),

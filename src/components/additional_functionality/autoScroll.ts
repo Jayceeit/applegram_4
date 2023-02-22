@@ -12,7 +12,7 @@ export class Scroll{
         this.scrape_status = document.querySelector('#scrape-status')
         this.scrape_count = document.querySelector('#scrape-count')
     }
-
+    // * Primary method to perform the automatic scrolling and calls the other method to perform intended functions
     public scrollChannel(container:any){
         this.scrape_status.textContent = 'Running'
         let intervalId = setInterval(async () => {
@@ -65,6 +65,8 @@ export class Scroll{
             let split_data:any[] = obj[id].split(' ')
             const split_data_length = split_data.length - 1
             let username 
+            // * appUserManager.users is an exposed api containing information on members of a group or channel 
+            // * This will use the key to check and see if more details about a certain can be obtain 
             if (!!appUsersManager.users[split_data[split_data.length - 1]]){
                 if('username' in appUsersManager.users[split_data[split_data_length]]){
                     username = `@${appUsersManager.users[split_data[split_data_length]].username}`
